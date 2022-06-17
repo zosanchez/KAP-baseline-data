@@ -8,8 +8,7 @@ library(tidyr)
 
 library(readr)
 #use this to read
-data<-read.csv("~/Immune/Data/original_data/immune_survey_23-05-2022.csv", header=TRUE, sep=";")
-
+data <- read.csv("KAP-baseline-data/immune_survey_23-05-2022.csv", header=TRUE, sep=";")
 #Limpiar
 #ID 63: Unicode registrado como 1.1.69.16 debe ser cambiado a 1.13.69.16
 data$UNICODE[data$ID==63]<- "1.13.69.16"
