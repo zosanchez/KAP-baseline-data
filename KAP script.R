@@ -125,7 +125,7 @@ data$SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO[data$ID==262]<- NA
 #change age from chr to numeric
 data$EDAD<- as.numeric(data$EDAD)
 
-#making age groups
+#making age groups. age groups based on range, IQR, median
 data<-mutate(data, AGECLASS= ifelse(EDAD<=31,"18-31",
                                     ifelse(EDAD<=45,"32-45",
                                            ifelse(EDAD<=59, "46-59",
@@ -135,10 +135,20 @@ data<-mutate(data, AGECLASS= ifelse(EDAD<=31,"18-31",
 #combine answers to ACTA_ECONOMICA and ACTA_ECONOMICA_OTRO to one column
 data<-mutate(data, OCCUPATIONS=ifelse(ACT_ECONOMICA == "ama_casa", "ama_casa",
                                       ifelse(ACT_ECONOMICA == "estudiante", "estudiante",
-                                             ifelse(ACT_ECONOMICA == "jubilado" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO == "Militar en retiro", "jubilado",
-                                                    ifelse(ACT_ECONOMICA == "sin_empleo", "sin_empleo",
-                                                           ifelse(ACT_ECONOMICA == "trabajador_independiente" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Directora de I.E(vivienda es I.E Inicial)" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Docente pronoi local publico" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="que mas pue" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Vivienda es tienda" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Vivienda es Tienda", "trabajador_independiente",
-                                                                  ifelse(ACT_ECONOMICA == "trabajador_planilla", "trabajador_planilla", 0)))))))
+                                             ifelse(ACT_ECONOMICA == "jubilado" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO == "Militar en retiro" | ACT_ECONOMICA == "sin_empleo", "other jobs",
+                                                      ifelse(ACT_ECONOMICA == "trabajador_independiente" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Directora de I.E(vivienda es I.E Inicial)" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Docente pronoi local publico" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="que mas pue" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Vivienda es tienda" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Vivienda es Tienda", "trabajador_independiente",
+                                                              ifelse(ACT_ECONOMICA == "trabajador_planilla", "trabajador_planilla", 0))))))
+
+#collapse education level groups into categories of primary or less, secondary, tecnico/university or more. make one column that shows grouped answers
+data<- mutate(data, EDUCATION_CATS=ifelse(NIVEL_ESTUDIOS == "ninguno" | NIVEL_ESTUDIOS == "primaria" | NIVEL_ESTUDIOS == "pre_escolar" | NIVEL_ESTUDIOS == "NS_NR", "primary or less",
+                                          ifelse(NIVEL_ESTUDIOS == "secundaria", "secondary",
+                                                 ifelse(NIVEL_ESTUDIOS == "tecnico" | NIVEL_ESTUDIOS == "universidad" | NIVEL_ESTUDIOS == "postgrado", "technical/univerity or more", 0))))
+
+#to show answers Y/N/NS_NR for CHIRI TRANSMITIR ENFERMEDAD
+table(data$CHIRI_TRANSMITIR_ENFERMEDAD)
+
+#to show answers for que enfermedades transmite chiri
+table(data$QUE_ENFERMEDADES_TRANSMITE_CHIRI)
 
 #to make a column for "other" answers to question about what disease chirimachas transmit.
 #"crecimiento de organos" and "enfermedad del corazón/pecho" could = Chagas, they might not have known the name 
@@ -181,6 +191,12 @@ data<- mutate(data, KNOWLEDGE_OF_DISEASE_TRANSMISSION=ifelse(CHIRI_TRANSMITIR_EN
                                                                                                                                                                       ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "Enfermedades de la piel", "Enfermedades de la piel",
                                                                                                                                                                              ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "Enfermedad del corazón/pecho", "Enfermedad del corazón/pecho",
                                                                                                                                                                                     ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "No se acuerda", "Si, pero no se acuerda", 0))))))))))))))))))))
+
+#collapse categories of what diseases are transmitted by chiris into correct/incorrect/NS_NR. these are out of those who said yes to chiri transmitir enfermedad. NS_NR refers to those who said yes chiris transmit disease, but didn't give an answer for what disease
+data<- mutate(data, DISEASE_TRANSMIT_CATS=ifelse(KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Chagas" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad peligrosa" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Crecimiento de organos" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad del corazón/pecho", "correct",
+                                                 ifelse(KNOWLEDGE_OF_DISEASE_TRANSMISSION == "no" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Tuberculosis" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Toxoplasma" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Paludismo" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Lesmidiasis" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Infección" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Dengue" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Alergia" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad del estomago" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Fiebre y otro" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Solo fiebre" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedades de la piel",
+                                                        ifelse(KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Si, pero no se acuerda" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Si, pero no sabe/responde", "NS_NR", 0))))
+
 
 
 #to create a new data base just with the variables you are going to use
@@ -313,6 +329,12 @@ data<-mutate(data, vector_cat=ifelse(CHIRI_ADULTA ==1 & sum_vector_ID==1,"solo a
                                                                                                                                                                                                                                          ifelse(CHIRI_ADULTA ==0 & CHIRI_NINFA_4_alim == 0 & CHIRI_NIFA_3 == 1 & CHIRI_NIFA_4_fl == 1 & sum_vector_ID==4,  "ninf4fl+ninf3=2other",
                                                                                                                                                                                                                                                 ifelse(CHIRI_ADULTA ==0 & CHIRI_NINFA_4_alim == 0 & CHIRI_NIFA_3 == 0 & CHIRI_NIFA_4_fl == 1 & sum_vector_ID==5,  "ninf4fl+4other",
                                                                                                                                                                                                                                                        ifelse(CHIRI_ADULTA ==1 & (CHIRI_NINFA_4_alim == 1 | CHIRI_NIFA_3 == 1 |CHIRI_NIFA_4_fl == 1) & sum_vector_ID==5,  "adult+2ninf+2other", 0)))))))))))))))))))))))))))))))))
+#create a new column for insect ID answer categories of Adult correct, at least one nymph correct, all 4 correct, and only incorrect
+data<- mutate(data, INSECT_CATS=ifelse(vector_cat == "solo adulta" | vector_cat == "adult+1ninf" | vector_cat == "adult+2ninf" | vector_cat == "adult+3ninf+1other" | vector_cat == "adult+1other" | vector_cat == "adult+2other" | vector_cat == "adult+3other" | vector_cat == "adult+2ninf+2other", "adult correct",
+                                       ifelse(vector_cat == "solo ninf3" | vector_cat == "solo ninf4 fl" | vector_cat == "solo ninf4 ali" | vector_cat == "solo 2ninf" | vector_cat == "solo 3ninf" | vector_cat == "ninf4ali+1other" | vector_cat == "ninf4ali+2other" | vector_cat == "ninf4ali+3other" | vector_cat == "ninf4ali+4other" | vector_cat == "ninf3+1other" | vector_cat == "ninf3+2other" | vector_cat == "ninf3+3other" | vector_cat == "ninf3+4other" | vector_cat == "ninf4fl+1other" | vector_cat == "ninf4fl+2other" | vector_cat == "ninf4fl+3other" | vector_cat == "ninf4fl+ninf3=2other" | vector_cat == "ninf4fl+4other", "any nymph correct", 
+                                              ifelse(vector_cat == "incorrect only(1)" | vector_cat == "incorrect only(2)" | vector_cat == "incorrect only(3)" | vector_cat == "incorrect only(4)", "incorrect only",
+                                                     ifelse(vector_cat == "adult+3ninf", "all 4 correct",
+                                                            ifelse(vector_cat == "NS_NR", "NS_NR", 0))))))
 
 
 #create a new column that contains categories of answers to the SABES_SENIALES CHIRI question. (sumvectorID up to 3 = the highest number of signs selected amongst the participants is 3) 
@@ -334,7 +356,12 @@ data<- mutate(data, sign_cat=ifelse(CHIRI_FECAL_TRAILS== 1 & sum_sign_ID== 1, "s
                                                                                                                                       ifelse(CHIRI_EGGS==1 & CHIRI_FECAL_TRAIL==1 &sum_sign_ID==2, "fecaltrail+eggs", 0)))))))))))))))))                                                                                                                                                                                     
 
 
-
+#create a new column for sign ID answer categories of only incorrect, all 3 correct, 1 correct, combination of 2 correct
+data<- mutate(data, SIGN_CATS=ifelse(sign_cat == "onlyincorrect(1)" | sign_cat == "onlyincorrect(2)" | sign_cat == "onlyincorrect(3)", "only incorrect",
+                                     ifelse(sign_cat == "all3signs", "all 3 correct",
+                                            ifelse(sign_cat == "solo fecal trails" | sign_cat == "fecaltrails+1other" | sign_cat == "fecaltrails+2other" | sign_cat == "eggs+1other" | sign_cat == "eggs+2other" | sign_cat == "fecaltrail+1other" | sign_cat == "fecaltrail+2other" | sign_cat == "solo eggs" | sign_cat == "solo fecal trail", "1 correct",
+                                                   ifelse(sign_cat == "fecaltrails+1sign" | sign_cat == "fecaltrail+eggs", "2 correct",
+                                                          ifelse(sign_cat == "NS_NR", "NS_NR", 0))))))
 
 
 #create column that sums knowledge for vectors (score without subtraction for incorrect answers)
@@ -351,7 +378,7 @@ data$score_vectors_10<-data$score_vectors+10
 #for IQR, median, range of vector scores
 quantile(data$score_vectors_10, na.rm=TRUE)
 
-#same as above, but for signs
+#same as above (scores), but for signs
 data$sum_correct_sign=rowSums(data[,c("CHIRI_FECAL_TRAILS", "CHIRI_EGGS", "CHIRI_FECAL_TRAIL")])
 data$sum_incorrect_sign=rowSums(data[,c("CHINCHE_CAMA_FECES", "MOUSE_FECES", "MOLD")])
 data$score_signs <- (data$sum_correct_sign - data$sum_incorrect_sign)
@@ -388,6 +415,10 @@ data<- mutate(data, QUE_PASA_REPORTE = ifelse(SABE_QUE_PASA_DENUNCIA_REPORTE_CHI
                                                                        ifelse(SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA== "otro" & (SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO=="Demora  en venir el inspector" | SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO== "Demoran en atender ,mucho tramite" | SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO=="Demoran en venir" | SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO== "Se tiene que insistir para que vengan a la casa"), "Demoran en venir",
                                                                              ifelse(SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA=="otro" & SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO=="Le avisan si tiene alguna enfermedad y si son varias casas fumigan la cuadra", "otro", 0))))))))
 
+#collapse answers in que pasa reporte to categories: correct answer, no hacen nada, NS_NR
+data<- mutate(data, REPORTE_CATS=ifelse(QUE_PASA_REPORTE == "fumigan" | QUE_PASA_REPORTE == "Inspector revisa" | QUE_PASA_REPORTE == "las analizan" | QUE_PASA_REPORTE == "Demoran en venir" | QUE_PASA_REPORTE == "otro", "correct",
+                                        ifelse(QUE_PASA_REPORTE == "No hacen nada", "no hacen nada",
+                                               ifelse(QUE_PASA_REPORTE == "NS_NR", "NS_NR", 0))))
 
 
 #to extract one answer/word from the column for quien hablado chiri and make new column for each extracted word. 1 is given if extracted answer is present for participant
@@ -417,6 +448,12 @@ data<- mutate(data, NOTICIAS=ifelse(OTRO==1 & (QUIEN_HABLADO_CHIRI_OTRO=="Notici
 data<- mutate(data, PROFESIONAL_SALUD_TOT=ifelse(PROFESIONAL_SALUD==1 | (QUIEN_HABLADO_CHIRI_OTRO== "Alguien que vino a su casa " | QUIEN_HABLADO_CHIRI_OTRO=="Hace mucho tiempo un grupo de extranjeros dieron charlas y tomaron muestra de sangre a los ninios de la I.E" | QUIEN_HABLADO_CHIRI_OTRO=="Inspector upch"), 1, 0))
 #to delete original profesional salud column created from quien hablado chiri
 data$PROFESIONAL_SALUD<-NULL
+
+#collapse answers above to categories of profesional salud, vecino/familiar, other. *check to see if agente comunidad should be with profesional salud or with others
+data<- mutate(data, QUIEN_HABLADO_CATS=ifelse(PROFESIONAL_SALUD_TOT == 1, "profesional salud",
+                                              ifelse(VECINO == 1 | FAMILIAR == 1, "vecino/familiar",
+                                                     ifelse(COLEGIO == 1 | OTRO_HABLADO == 1 | CUANDO_FUMIGARON == 1 | GOBIERNO_REGIONAL == 1 | PERIFONEO == 1 | NOTICIAS == 1 | UNIVERSIDAD == 1 | AMIGO == 1, "other", 0))))
+
 
 #to extract one answer/word from the column for oido/visto chiri and make new column for each extracted word. 1 is given if extracted answer is present for participant
 data<- data%>%mutate(POSTA=grepl("posta", OIDO_VISTO_INFORMACION_CHIRI)*1)
@@ -543,7 +580,10 @@ data1$secos <- ifelse(data1$seco == 1, 1, 0)
 data1$camas <- ifelse(data1$cama == 1, 1, 0)
 data1$pircas <- ifelse(data1$pirca == 1, 1, 0)
 
-
+#create a new column that collapses the categories from above into groups of "correct"(aligns with what the ministry of health tells people to look for/looks for), "incorrect"(could be accurate, but not what the ministry stresses), and ?
+#This should will place responses that contain the answer in the groups that have that (ex: response = "corrales de animales, lugares secos, debajo de cama" will go in the correct column bc it contains corrales de animales, which is "correct")
+data1<- mutate(data1, DONDE_BUSCA_CATS=ifelse(animales == 1 | disorganizacion == 1 | patios == 1 | techos == 1 | cuartos == 1, "correct-ministry",
+                                              ifelse()))
 
 #to make one new column with categories for donde buscar chiris using the columns made above. 
 #NOTE not useful for what we want
