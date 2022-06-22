@@ -126,14 +126,13 @@ data$SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO[data$ID==262]<- NA
 data$EDAD<- as.numeric(data$EDAD)
 
 #making age groups
-#age1<- filter(data, EDAD <= 45)
 data<-mutate(data, AGECLASS= ifelse(EDAD<=31,"18-31",
                                     ifelse(EDAD<=45,"32-45",
                                            ifelse(EDAD<=59, "46-59",
                                                   ifelse(EDAD<=100, "60-100", "0")))))
 
 
-#combine jobs and other jobs to one column
+#combine answers to ACTA_ECONOMICA and ACTA_ECONOMICA_OTRO to one column
 data<-mutate(data, OCCUPATIONS=ifelse(ACT_ECONOMICA == "ama_casa", "ama_casa",
                                       ifelse(ACT_ECONOMICA == "estudiante", "estudiante",
                                              ifelse(ACT_ECONOMICA == "jubilado" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO == "Militar en retiro", "jubilado",
@@ -141,8 +140,8 @@ data<-mutate(data, OCCUPATIONS=ifelse(ACT_ECONOMICA == "ama_casa", "ama_casa",
                                                            ifelse(ACT_ECONOMICA == "trabajador_independiente" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Directora de I.E(vivienda es I.E Inicial)" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Docente pronoi local publico" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="que mas pue" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Vivienda es tienda" | ACT_ECONOMICA == "otro" & ACT_ECONOMICA_OTRO =="Vivienda es Tienda", "trabajador_independiente",
                                                                   ifelse(ACT_ECONOMICA == "trabajador_planilla", "trabajador_planilla", 0)))))))
 
-#to make column for "other" answers to question about transmission
-#"crecimiento de organos" and "enfermedad del corazón/pecho" could = Chagas 
+#to make a column for "other" answers to question about what disease chirimachas transmit.
+#"crecimiento de organos" and "enfermedad del corazón/pecho" could = Chagas, they might not have known the name 
 data<-mutate(data, OTHER_DISEASES=ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "No sé acuerda" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No recuerda el nombre" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda el nombre" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda. " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerdan", "No se acuerda",
                                          ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enfermedad al corazón " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Enfermedad del corazón " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Enfermedad del pecho " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Enfermedad en el corazón " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Enfermedad en el pecho ", "Enfermedad del corazón/pecho",
                                                 ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enrojecimiento de la piel" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Picazon,hace heridas", "Enfermedades de la piel",
@@ -162,7 +161,7 @@ data<-mutate(data, OTHER_DISEASES=ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =
 
 
 
-#combine knowledge that chiris transmit, what disease, and other in one column
+#combine knowledge that chirimachas transmit a disease, what disease, and answers for others in one column
 data<- mutate(data, KNOWLEDGE_OF_DISEASE_TRANSMISSION=ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "no", "no",
                                                              ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "NS_NR", "NS_NR",
                                                                     ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "chagas", "Chagas",
@@ -184,11 +183,10 @@ data<- mutate(data, KNOWLEDGE_OF_DISEASE_TRANSMISSION=ifelse(CHIRI_TRANSMITIR_EN
                                                                                                                                                                                     ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "No se acuerda", "Si, pero no se acuerda", 0))))))))))))))))))))
 
 
-
 #to create a new data base just with the variables you are going to use
 #df<- select(data, CUALES_PLACA_SON_CHIRI)
 
-#to extract one answer/word from the column for vectors
+#to extract one answer/word from CUALES_PLACA_SON_CHIRI column. New column is created and 1 is given if extracted answer is present
 data<- data%>%mutate(NS_NR=grepl("NS_NR", CUALES_PLACA_SON_CHIRI)*1)
 data<- data%>%mutate(CHIRI_ADULTA=grepl("chiri_adulta", CUALES_PLACA_SON_CHIRI)*1)
 data<- data%>%mutate(CHIRI_NIFA_3=grepl("chiri_nifa_3", CUALES_PLACA_SON_CHIRI)*1)
@@ -203,7 +201,7 @@ data<- data%>%mutate(ESCARBAJO=grepl("escarabajo", CUALES_PLACA_SON_CHIRI)*1)
 data<- data%>%mutate(GORGOJO=grepl("gorgojo", CUALES_PLACA_SON_CHIRI)*1)
 data<- data%>%mutate(MOSCA=grepl("mosca", CUALES_PLACA_SON_CHIRI)*1)
 
-#to change 1 to NS_NR for vectors
+#to enter "NS_NR" in all columns created above when NS_NR column has a 1
 data$CHIRI_ADULTA[data$NS_NR==1]<- "NS_NR"
 data$CHIRI_NIFA_3[data$NS_NR==1]<- "NS_NR"
 data$CHIRI_NIFA_4_fl[data$NS_NR==1]<- "NS_NR"
@@ -217,7 +215,7 @@ data$ESCARBAJO[data$NS_NR==1]<- "NS_NR"
 data$GORGOJO[data$NS_NR==1]<- "NS_NR"
 data$MOSCA[data$NS_NR==1]<- "NS_NR"
 
-#to change NS_NR to 10 for all possible vector columns and then change to numeric for scores
+#to change NS_NR to 10 for all possible vector columns (above) and then change to numeric for scores
 data["CHIRI_ADULTA"][data["CHIRI_ADULTA"]=="NS_NR"]<-"10"
 data$CHIRI_ADULTA<-as.numeric(data$CHIRI_ADULTA)
 data["CHIRI_NIFA_3"][data["CHIRI_NIFA_3"]=="NS_NR"]<-"10"
@@ -244,8 +242,7 @@ data["MOSCA"][data["MOSCA"]=="NS_NR"]<-"10"
 data$MOSCA<-as.numeric(data$MOSCA)
 
 
-
-#to extract one answer/word from the column for signs
+#to extract one answer/word from SABES_SENIALES_CHIRI column. New column is created and 1 is given if extracted answer is present
 data<- data%>%mutate(NS_NR_SENIALES=grepl("NS_NR", SABES_SENIALES_CHIRI)*1)
 data<- data%>%mutate(CHIRI_FECAL_TRAILS=grepl("a", SABES_SENIALES_CHIRI)*1)
 data<- data%>%mutate(CHINCHE_CAMA_FECES=grepl("b", SABES_SENIALES_CHIRI)*1)
@@ -254,7 +251,7 @@ data<- data%>%mutate(MOLD=grepl("d", SABES_SENIALES_CHIRI)*1)
 data<- data%>%mutate(CHIRI_EGGS=grepl("e", SABES_SENIALES_CHIRI)*1)
 data<- data%>%mutate(CHIRI_FECAL_TRAIL=grepl("f", SABES_SENIALES_CHIRI)*1)
 
-#to change 1 to NS_NR for signs
+#to enter "NS_NR" in all columns created above when NS_NR column has a 1
 data$CHINCHE_CAMA_FECES[data$NS_NR_SENIALES==1]<- "NS_NR"
 data$MOUSE_FECES[data$NS_NR_SENIALES==1]<- "NS_NR"
 data$MOLD[data$NS_NR_SENIALES==1]<- "NS_NR"
@@ -262,7 +259,7 @@ data$CHIRI_EGGS[data$NS_NR_SENIALES==1]<- "NS_NR"
 data$CHIRI_FECAL_TRAIL[data$NS_NR_SENIALES==1]<- "NS_NR"
 data$CHIRI_FECAL_TRAILS[data$NS_NR_SENIALES==1]<- "NS_NR"
 
-#to change NS_NR to 10 for all possible signs columns and then change to numeric for scores
+#to change NS_NR to 10 for all possible signs columns (above) and then change to numeric for scores
 data["CHIRI_FECAL_TRAILS"][data["CHIRI_FECAL_TRAILS"]=="NS_NR"]<-"10"
 data$CHIRI_FECAL_TRAILS<-as.numeric(data$CHIRI_FECAL_TRAILS)
 data["CHINCHE_CAMA_FECES"][data["CHINCHE_CAMA_FECES"]=="NS_NR"]<-"10"
@@ -276,14 +273,14 @@ data$CHIRI_EGGS<-as.numeric(data$CHIRI_EGGS)
 data["CHIRI_FECAL_TRAIL"][data["CHIRI_FECAL_TRAIL"]=="NS_NR"]<-"10"
 data$CHIRI_FECAL_TRAIL<-as.numeric(data$CHIRI_FECAL_TRAIL)
 
-#create column that sums all rows from vector columns
+#create column that sums all rows from vector columns. to see how many options participants chose
 data$sum_vector_ID=rowSums(data[,c("CHIRI_ADULTA","CHIRI_NIFA_3","CHIRI_NIFA_4_fl", "CHIRI_NINFA_4_alim","COREIDO","CHINCHE_CAMA","CHINCHE_HEDIONDA","CUCARACHA", "CHINCHE_CINTURON_AMARILLO","ESCARBAJO", "GORGOJO", "MOSCA")])
 
-#create column that sums all rows from vector columns
+#create column that sums all rows from sign columns. to see how many options participants chose
 data$sum_sign_ID=rowSums(data[,c("CHIRI_FECAL_TRAILS","CHINCHE_CAMA_FECES","MOUSE_FECES", "MOLD","CHIRI_EGGS","CHIRI_FECAL_TRAIL")])
 
 
-#categories for vector ID (sumvectorID up to 5)
+#create a new column that contains categories of answers to the CUALES_PLACA_SON_CHIRI question. (sumvectorID up to 5 = the highest number of insects selected amongst the participants is 5) 
 data<-mutate(data, vector_cat=ifelse(CHIRI_ADULTA ==1 & sum_vector_ID==1,"solo adulta", 
                                      ifelse(sum_vector_ID==120, "NS_NR",
                                             ifelse(CHIRI_NIFA_3 == 1 & sum_vector_ID==1, "solo ninf3",
@@ -292,7 +289,7 @@ data<-mutate(data, vector_cat=ifelse(CHIRI_ADULTA ==1 & sum_vector_ID==1,"solo a
                                                                  ifelse(CHIRI_ADULTA ==1 & (CHIRI_NINFA_4_alim == 1 | CHIRI_NIFA_3 == 1 |CHIRI_NIFA_4_fl == 1) & sum_vector_ID==2,  "adult+1ninf",
                                                                         ifelse(CHIRI_ADULTA ==1 & (CHIRI_NINFA_4_alim == 1 | CHIRI_NIFA_3 == 1 |CHIRI_NIFA_4_fl == 1) & sum_vector_ID==3,  "adult+2ninf",
                                                                                ifelse(CHIRI_ADULTA ==1 & (CHIRI_NINFA_4_alim == 1 | CHIRI_NIFA_3 == 1 |CHIRI_NIFA_4_fl == 1) & sum_vector_ID==4,  "adult+3ninf",
-                                                                                      ifelse(CHIRI_ADULTA ==1 & (CHIRI_NINFA_4_alim == 1 | CHIRI_NIFA_3 == 1 |CHIRI_NIFA_4_fl == 1) & sum_vector_ID==5,  "adult+4ninf",
+                                                                                      ifelse(CHIRI_ADULTA ==1 & (CHIRI_NINFA_4_alim == 1 & CHIRI_NIFA_3 == 1 & CHIRI_NIFA_4_fl == 1) & sum_vector_ID==5,  "adult+3ninf+1other",
                                                                                              ifelse(CHIRI_ADULTA ==1 & CHIRI_NINFA_4_alim == 0 & CHIRI_NIFA_3 == 0 & CHIRI_NIFA_4_fl == 0 & sum_vector_ID==2,  "adult+1other",
                                                                                                     ifelse(CHIRI_ADULTA ==1 & CHIRI_NINFA_4_alim == 0 & CHIRI_NIFA_3 == 0 & CHIRI_NIFA_4_fl == 0 & sum_vector_ID==3,  "adult+2other",
                                                                                                            ifelse(CHIRI_ADULTA ==1 & CHIRI_NINFA_4_alim == 0 & CHIRI_NIFA_3 == 0 & CHIRI_NIFA_4_fl == 0 & sum_vector_ID==4,  "adult+3other",
@@ -314,11 +311,11 @@ data<-mutate(data, vector_cat=ifelse(CHIRI_ADULTA ==1 & sum_vector_ID==1,"solo a
                                                                                                                                                                                                                            ifelse(CHIRI_ADULTA ==0 & CHIRI_NINFA_4_alim == 0 & CHIRI_NIFA_3 == 0 & CHIRI_NIFA_4_fl == 1 & sum_vector_ID==3,  "ninf4fl+2other",
                                                                                                                                                                                                                                   ifelse(CHIRI_ADULTA ==0 & CHIRI_NINFA_4_alim == 0 & CHIRI_NIFA_3 == 0 & CHIRI_NIFA_4_fl == 1 & sum_vector_ID==4,  "ninf4fl+3other",
                                                                                                                                                                                                                                          ifelse(CHIRI_ADULTA ==0 & CHIRI_NINFA_4_alim == 0 & CHIRI_NIFA_3 == 1 & CHIRI_NIFA_4_fl == 1 & sum_vector_ID==4,  "ninf4fl+ninf3=2other",
-                                                                                                                                                                                                                                                ifelse(CHIRI_ADULTA ==0 & CHIRI_NINFA_4_alim == 0 & CHIRI_NIFA_3 == 0 & CHIRI_NIFA_4_fl == 1 & sum_vector_ID==5,  "ninf4fl+4other",0))))))))))))))))))))))))))))))))
+                                                                                                                                                                                                                                                ifelse(CHIRI_ADULTA ==0 & CHIRI_NINFA_4_alim == 0 & CHIRI_NIFA_3 == 0 & CHIRI_NIFA_4_fl == 1 & sum_vector_ID==5,  "ninf4fl+4other",
+                                                                                                                                                                                                                                                       ifelse(CHIRI_ADULTA ==1 & (CHIRI_NINFA_4_alim == 1 | CHIRI_NIFA_3 == 1 |CHIRI_NIFA_4_fl == 1) & sum_vector_ID==5,  "adult+2ninf+2other", 0)))))))))))))))))))))))))))))))))
 
 
-
-#categories for sign IDs (sumsignID up to 3)
+#create a new column that contains categories of answers to the SABES_SENIALES CHIRI question. (sumvectorID up to 3 = the highest number of signs selected amongst the participants is 3) 
 data<- mutate(data, sign_cat=ifelse(CHIRI_FECAL_TRAILS== 1 & sum_sign_ID== 1, "solo fecal trails",
                                     ifelse(sum_sign_ID==60, "NS_NR",
                                            ifelse(CHIRI_FECAL_TRAILS==1 & (CHIRI_EGGS==1 | CHIRI_FECAL_TRAIL==1)& sum_sign_ID==2, "fecaltrails+1sign",
@@ -340,13 +337,13 @@ data<- mutate(data, sign_cat=ifelse(CHIRI_FECAL_TRAILS== 1 & sum_sign_ID== 1, "s
 
 
 
-#create column that sums knowledge for vectors (score without subtraction)
+#create column that sums knowledge for vectors (score without subtraction for incorrect answers)
 data$sum_correct_vector=rowSums(data[,c("CHIRI_ADULTA","CHIRI_NIFA_3","CHIRI_NIFA_4_fl", "CHIRI_NINFA_4_alim")])
 #create column that sums incorrect vector choices
 data$sum_incorrect_vector=rowSums(data[,c("COREIDO","CHINCHE_CAMA","CHINCHE_HEDIONDA","CUCARACHA", "CHINCHE_CINTURON_AMARILLO","ESCARBAJO", "GORGOJO", "MOSCA")])
-#create column with correct - incorrect scores
+#create column with correct - incorrect scores for insect ID
 data$score_vectors<- (data$sum_correct_vector - data$sum_incorrect_vector)
-#turn -40 into NA in vector score column and then make numeric
+#turn score of -40 into NA in vector score column and then make numeric
 data["score_vectors"][data["score_vectors"]=="-40"]<-"NA"
 data$score_vectors<- as.numeric(data$score_vectors)
 #add 10 to each value so you can do median, etc
@@ -358,7 +355,7 @@ quantile(data$score_vectors_10, na.rm=TRUE)
 data$sum_correct_sign=rowSums(data[,c("CHIRI_FECAL_TRAILS", "CHIRI_EGGS", "CHIRI_FECAL_TRAIL")])
 data$sum_incorrect_sign=rowSums(data[,c("CHINCHE_CAMA_FECES", "MOUSE_FECES", "MOLD")])
 data$score_signs <- (data$sum_correct_sign - data$sum_incorrect_sign)
-#turn 60s into NA in sign score column and then make numeric
+#turn score of 60 into NA in sign score column and then make numeric
 data["score_signs"][data["sum_sign_ID"]=="60" ]<-"NA"
 data$score_signs<-as.numeric(data$score_signs)
 #add 10 to each value so you can do median, etc
@@ -367,7 +364,7 @@ data$score_signs_10<-data$score_signs+10
 quantile(data$score_signs_10, na.rm=TRUE)
 
 
-#to combine what would you do if you saw a chiri in your house and "other" in one new column
+#to combine and categorize given answers for what would you do if you saw a chiri in your house and "other" answers in one new column
 #Decirle a su esposo es biologo and Si encuentra solo una la mata,si encuentra varias acudiria al centro de salud in "other"
 data<-mutate(data, QUE_HARIA_CHIRIS=ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "atraparia_centro_salud", "atraparia centro salud",
                                          ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "mataria", "mataria",
@@ -377,10 +374,11 @@ data<-mutate(data, QUE_HARIA_CHIRIS=ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "atrapa
                                                                      ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "NS_NR", "NS_NR",
                                                                             ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "reportaria", "reportaria",
                                                                                    ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar la casa " | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpieza"| VIERA_CHIRI_CASA_QUE_HARIA_OTRO =="Hecho agua caliente"), "limpiar",
+                                                                                          ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Decirle a su esposo es biologo" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Si encuentra solo una la mata,si encuentra varias acudiria al centro de salud"), "Others", 0))))))))))
+
      
-                                                                                                                                                                               ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Decirle a su esposo es biologo" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Si encuentra solo una la mata,si encuentra varias acudiria al centro de salud"), "Others", 0))))))))))
                                                 
-#to combine "what happens when you report chiris" and "other" in one new column
+#to combine and categorize answers for "what happens when you report chiris" and "other" answers in one new column
 #other is "Le avisan si tiene alguna enfermedad y si son varias casas fumigan la cuadra"
 data<- mutate(data, QUE_PASA_REPORTE = ifelse(SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA == "fumigan" |(SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA=="otro"& SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO== "Vienen a matarlas "), "fumigan",
                                               ifelse(SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA == "inspector_revisa" | (SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA== "otro" & 	SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO== "Vienen a ver mis corrales "), "Inspector revisa",
@@ -392,7 +390,7 @@ data<- mutate(data, QUE_PASA_REPORTE = ifelse(SABE_QUE_PASA_DENUNCIA_REPORTE_CHI
 
 
 
-#to extract one answer/word from the column for quien hablado chiri
+#to extract one answer/word from the column for quien hablado chiri and make new column for each extracted word. 1 is given if extracted answer is present for participant
 data<- data%>%mutate(AGENTE_COMUNIDAD=grepl("agente_comunidad", QUIEN_HABLADO_CHIRI)*1)
 data<- data%>%mutate(VECINO=grepl("vecino", QUIEN_HABLADO_CHIRI)*1)
 data<- data%>%mutate(FAMILIAR=grepl("familiar", QUIEN_HABLADO_CHIRI)*1)
@@ -401,26 +399,26 @@ data<- data%>%mutate(OTRO=grepl("otro", QUIEN_HABLADO_CHIRI)*1)
 data<- data%>%mutate(AMIGO=grepl("amigo", QUIEN_HABLADO_CHIRI)*1)
 
 
-#to make new column for colegio category from quien hablado 
+#to make new column for colegio category from quien hablado chiri otro
 data<- mutate(data, COLEGIO=ifelse(OTRO==1 & (QUIEN_HABLADO_CHIRI_OTRO=="Colegio"| QUIEN_HABLADO_CHIRI_OTRO=="Colegio " | QUIEN_HABLADO_CHIRI_OTRO=="Colegio ,historietas hace 6 años" | QUIEN_HABLADO_CHIRI_OTRO== "En el colegio"), 1, 0))
-#to make new column for others category from quien hablado
+#to make new column for others category from quien hablado chiri otro
 data<- mutate(data, OTRO_HABLADO=ifelse(OTRO==1 & (QUIEN_HABLADO_CHIRI_OTRO== "Cochabamba" | QUIEN_HABLADO_CHIRI_OTRO== "Recolector de basura" | QUIEN_HABLADO_CHIRI_OTRO=="Hace muchos anios"), 1, 0))
-#to make new column for cuando fumigaron category from quien hablado
+#to make new column for cuando fumigaron category from quien hablado chiri otro
 data<- mutate(data, CUANDO_FUMIGARON=ifelse(OTRO==1 & (QUIEN_HABLADO_CHIRI_OTRO=="Cuando fumigaron" | QUIEN_HABLADO_CHIRI_OTRO=="Hace mucho tiempo cuando vinieron a fumigar"), 1, 0))
-#to make new column for gobierno regional category from quien hablado
+#to make new column for gobierno regional category from quien hablado chiri otro
 data<- mutate(data, GOBIERNO_REGIONAL=ifelse(OTRO==1 & (QUIEN_HABLADO_CHIRI_OTRO=="En el gobierno regional" | QUIEN_HABLADO_CHIRI_OTRO== "Los del concejo"), 1, 0))
-#to make new column for university category from quien hablado
+#to make new column for university category from quien hablado chiri otro
 data<- mutate(data, UNIVERSIDAD=ifelse(OTRO==1 & QUIEN_HABLADO_CHIRI_OTRO=="En la universidad ", 1, 0))
-#to make new column for perifoneo category from quien hablado
+#to make new column for perifoneo category from quien hablado chiri otro
 data<- mutate(data, PERIFONEO=ifelse(OTRO==1 & (QUIEN_HABLADO_CHIRI_OTRO=="En perifoneo" | QUIEN_HABLADO_CHIRI_OTRO=="Perifoneo"), 1, 0))
-#to make new column for amigo category from quien hablado
+#to make new column for amigo category from quien hablado chiri otro
 data<- mutate(data, NOTICIAS=ifelse(OTRO==1 & (QUIEN_HABLADO_CHIRI_OTRO=="Noticias" | QUIEN_HABLADO_CHIRI_OTRO== "Noticias " | QUIEN_HABLADO_CHIRI_OTRO== "Por las noticias " | QUIEN_HABLADO_CHIRI_OTRO== "Propaganda en la television hace 4 anios aproximado" | QUIEN_HABLADO_CHIRI_OTRO== "Radio"), 1, 0))
-#to make new column for profesional salud from profesional salud column above plus others
+#to make new column for profesional salud from profesional salud column above plus quien hablado chiri otro
 data<- mutate(data, PROFESIONAL_SALUD_TOT=ifelse(PROFESIONAL_SALUD==1 | (QUIEN_HABLADO_CHIRI_OTRO== "Alguien que vino a su casa " | QUIEN_HABLADO_CHIRI_OTRO=="Hace mucho tiempo un grupo de extranjeros dieron charlas y tomaron muestra de sangre a los ninios de la I.E" | QUIEN_HABLADO_CHIRI_OTRO=="Inspector upch"), 1, 0))
-#to delete profesional salud column
+#to delete original profesional salud column created from quien hablado chiri
 data$PROFESIONAL_SALUD<-NULL
 
-#to extract one answer/word from the column for oido/visto chiri
+#to extract one answer/word from the column for oido/visto chiri and make new column for each extracted word. 1 is given if extracted answer is present for participant
 data<- data%>%mutate(POSTA=grepl("posta", OIDO_VISTO_INFORMACION_CHIRI)*1)
 data<- data%>%mutate(COLEGIO_UNIVERSIDAD_OIDO=grepl("colegio_universidad", OIDO_VISTO_INFORMACION_CHIRI)*1)
 data<- data%>%mutate(REDES_SOCIALES=grepl("redes_sociales", OIDO_VISTO_INFORMACION_CHIRI)*1)
@@ -428,7 +426,7 @@ data<- data%>%mutate(MEDIO_COMUNICACION=grepl("medio_comunicacion", OIDO_VISTO_I
 data<- data%>%mutate(VECINDARIO=grepl("vecindario", OIDO_VISTO_INFORMACION_CHIRI)*1)
 data<- data%>%mutate(OTRO_OIDO=grepl("otro", OIDO_VISTO_INFORMACION_CHIRI)*1)
 
-#to make new column for categories like above for oido/visto chiri
+#to make new column for categories from oidi visto informacion chiri otro like above for oido/visto chiri
 data<- mutate(data, CASA_FAMILIAR=ifelse(OTRO_OIDO==1 & (OIDO_VISTO_INFORMACION_CHIRI_OTRO=="Casa" | OIDO_VISTO_INFORMACION_CHIRI_OTRO== "Casa de un familiar" | OIDO_VISTO_INFORMACION_CHIRI_OTRO=="Familiares" | OIDO_VISTO_INFORMACION_CHIRI_OTRO=="Y  en mi domicilio"), 1, 0))
 data<- mutate(data, CALLE=ifelse(OTRO_OIDO==1 & (OIDO_VISTO_INFORMACION_CHIRI_OTRO=="En el mercado San Camilo hace años" | OIDO_VISTO_INFORMACION_CHIRI_OTRO=="En un mercado" | OIDO_VISTO_INFORMACION_CHIRI_OTRO=="Characato" | OIDO_VISTO_INFORMACION_CHIRI_OTRO=="En Cerro colorado " |OIDO_VISTO_INFORMACION_CHIRI_OTRO=="En la calle " |OIDO_VISTO_INFORMACION_CHIRI_OTRO=="En las calles perifoneo" | OIDO_VISTO_INFORMACION_CHIRI_OTRO=="En otro distrito" |OIDO_VISTO_INFORMACION_CHIRI_OTRO=="Hace 10 anios en Miraflores" |OIDO_VISTO_INFORMACION_CHIRI_OTRO=="Otro distrito"), 1, 0))
 data<- mutate(data, OTRO_OIDO1=ifelse(OTRO_OIDO==1 & (OIDO_VISTO_INFORMACION_CHIRI_OTRO=="En la Ciudad de Ica,vio chirimachas y le hablo el personal de salud" |OIDO_VISTO_INFORMACION_CHIRI_OTRO=="En Nazca Ica hace años" | OIDO_VISTO_INFORMACION_CHIRI_OTRO=="Hace 10 anios un joven fue a donar sangre para un familiar y le dijeron que no podia porque tenia el mal de chagas" |OIDO_VISTO_INFORMACION_CHIRI_OTRO=="Hace tiempo cuando hicieron campaña" |OIDO_VISTO_INFORMACION_CHIRI_OTRO=="Por una capacitacion" |OIDO_VISTO_INFORMACION_CHIRI_OTRO=="En un documental"), 1, 0))
@@ -439,42 +437,24 @@ data$REDES_SOCIALES<-NULL
 data$OTRO_OIDO<-NULL
 
 
-
-#to make new column with categories for where you find chiris
-#NOT USING THIS CODE, DELETE LATER
-data<- mutate(data, CAT_DONDE_BUSCA_CHIRI = ifelse(DONDE_BUSCA_CHIRI == "Acumulación de basura" | DONDE_BUSCA_CHIRI == "Basura" | DONDE_BUSCA_CHIRI =="Donde esta acumulados las cosas" | DONDE_BUSCA_CHIRI == "Cosas amontonadas" | DONDE_BUSCA_CHIRI == "Cosas guardadas mucho tiempo " | DONDE_BUSCA_CHIRI =="Donde hay cosas amontonadas" | DONDE_BUSCA_CHIRI =="Donde hay cosas guardadas" | DONDE_BUSCA_CHIRI =="En los depósitos donde hay cosas amontonadas" | DONDE_BUSCA_CHIRI == "Lugares amontonados ", "disorganization",
-                                                   ifelse(DONDE_BUSCA_CHIRI == "Animales" | DONDE_BUSCA_CHIRI =="Animales " | DONDE_BUSCA_CHIRI =="Animales corrales cuyeros" | DONDE_BUSCA_CHIRI == "Animales desmontes" | DONDE_BUSCA_CHIRI =="Conejero " | DONDE_BUSCA_CHIRI =="Conejeros" | DONDE_BUSCA_CHIRI =="Conejos" | DONDE_BUSCA_CHIRI =="Corral de animales" | DONDE_BUSCA_CHIRI =="Corrales" | DONDE_BUSCA_CHIRI =="Corrales de animales" | DONDE_BUSCA_CHIRI =="Corrales de conejos, gallinas" | DONDE_BUSCA_CHIRI =="Corrales de cuyes y aves" |  DONDE_BUSCA_CHIRI =="Corrales donde no hey limpieza " | DONDE_BUSCA_CHIRI =="Donde ay animales" | DONDE_BUSCA_CHIRI =="Donde crían animales" | DONDE_BUSCA_CHIRI =="Donde esta los animales" | DONDE_BUSCA_CHIRI =="Donde estan los animales" | DONDE_BUSCA_CHIRI =="Donde están los animales" |  DONDE_BUSCA_CHIRI =="Donde estan los animales " |  DONDE_BUSCA_CHIRI =="Donde estan los conejos y pollos" |   DONDE_BUSCA_CHIRI =="Donde estan los conejos" | DONDE_BUSCA_CHIRI =="Donde hay animales" |  DONDE_BUSCA_CHIRI =="Donde hay animales " |  DONDE_BUSCA_CHIRI =="Donde hay gallinas" |  DONDE_BUSCA_CHIRI =="Donde los animales" |  DONDE_BUSCA_CHIRI =="Donde viven los animales" |  DONDE_BUSCA_CHIRI =="Donde viven los animales " |  DONDE_BUSCA_CHIRI =="Donde viven los animales cuyos gallinas" |  DONDE_BUSCA_CHIRI =="En corrales" |  DONDE_BUSCA_CHIRI =="En corrales " |  DONDE_BUSCA_CHIRI =="En el corral de cuyes" |  DONDE_BUSCA_CHIRI =="En el corral de los perros " |  DONDE_BUSCA_CHIRI =="En el corral de pollos" |  DONDE_BUSCA_CHIRI =="En el corral de pollos " |  DONDE_BUSCA_CHIRI =="En el corral del perro " |  DONDE_BUSCA_CHIRI =="En el cuy" |  DONDE_BUSCA_CHIRI =="En el cuyero" |  DONDE_BUSCA_CHIRI =="En el cuyero " |  DONDE_BUSCA_CHIRI =="En la casa del perro " |  DONDE_BUSCA_CHIRI =="En la perrera" |  DONDE_BUSCA_CHIRI =="En la perrera " |  DONDE_BUSCA_CHIRI =="En los animales" |  DONDE_BUSCA_CHIRI =="En los animales " |  DONDE_BUSCA_CHIRI =="En los conejeros" |  DONDE_BUSCA_CHIRI =="En los conejeros,corral de ovejas" |  DONDE_BUSCA_CHIRI =="En los corrales" |  DONDE_BUSCA_CHIRI =="En los corral" |  DONDE_BUSCA_CHIRI =="En los corrales " | DONDE_BUSCA_CHIRI =="En los cuyeros" |  DONDE_BUSCA_CHIRI =="En los cuyeros " | DONDE_BUSCA_CHIRI =="En los corrales basural" |  DONDE_BUSCA_CHIRI =="En los gallineros" |  DONDE_BUSCA_CHIRI =="Gellineros cuyeros" |  DONDE_BUSCA_CHIRI =="Los animales" |  DONDE_BUSCA_CHIRI =="Los corrales" | DONDE_BUSCA_CHIRI =="Patio de animales" |  DONDE_BUSCA_CHIRI =="Por donde estan los animales" |  DONDE_BUSCA_CHIRI =="Tienen animales corrales", "animales",
-                                                          ifelse( DONDE_BUSCA_CHIRI =="Cosas viejas sucias" |  DONDE_BUSCA_CHIRI =="En la basura donde no hay limpieza " |  DONDE_BUSCA_CHIRI =="En los rincones donde  no se limpia" |  DONDE_BUSCA_CHIRI =="Lugares donde no se limpia" | DONDE_BUSCA_CHIRI =="Lugares donde no se limpian" | DONDE_BUSCA_CHIRI =="Lugares sucios", "lugares sucios",
-                                                                  ifelse( DONDE_BUSCA_CHIRI =="Debajo de ladrillos" |  DONDE_BUSCA_CHIRI =="Debajo de los ladrillos" |  DONDE_BUSCA_CHIRI =="Debajo los ladrillos" |  DONDE_BUSCA_CHIRI =="En los ladrillos" |  DONDE_BUSCA_CHIRI =="En los ladrillos " |  DONDE_BUSCA_CHIRI =="Grietas de los ladrillos" |  DONDE_BUSCA_CHIRI =="Ladrillos" |  DONDE_BUSCA_CHIRI =="Ladrillos " |  DONDE_BUSCA_CHIRI =="Ladrillos pircados" |  DONDE_BUSCA_CHIRI =="Por los ladrillos", "ladrillos",
-                                                                          ifelse( DONDE_BUSCA_CHIRI =="Debajo de los sillares" |  DONDE_BUSCA_CHIRI =="Debajo de sillares" |  DONDE_BUSCA_CHIRI =="Debajo del sillar" |  DONDE_BUSCA_CHIRI =="En el sillar" |  DONDE_BUSCA_CHIRI =="En los sillares" | DONDE_BUSCA_CHIRI =="En los sillares pircados" | DONDE_BUSCA_CHIRI =="Por los sillares" | DONDE_BUSCA_CHIRI =="Sillar" | DONDE_BUSCA_CHIRI =="Sillares", "sillares",
-                                                                                  ifelse( DONDE_BUSCA_CHIRI =="Adobe" | DONDE_BUSCA_CHIRI =="En las pircas de adobe", "adobe",
-                                                                                          ifelse( DONDE_BUSCA_CHIRI =="Cama " | DONDE_BUSCA_CHIRI =="Camas" | DONDE_BUSCA_CHIRI =="Debajo de cama" | DONDE_BUSCA_CHIRI =="Debajo de la cama" | DONDE_BUSCA_CHIRI =="Debajo de la cama " | DONDE_BUSCA_CHIRI =="Debajo de las camas" | DONDE_BUSCA_CHIRI =="En las camas" | DONDE_BUSCA_CHIRI =="Colchones" | DONDE_BUSCA_CHIRI =="Debajo de colchones " | DONDE_BUSCA_CHIRI =="Debajo de los colchones", "cama",
-                                                                                                  ifelse(DONDE_BUSCA_CHIRI =="Debajo de la piedras" | DONDE_BUSCA_CHIRI == "Debajo de las piedras" | DONDE_BUSCA_CHIRI =="Debajo de piedras" | DONDE_BUSCA_CHIRI =="Debajo de piedras " |DONDE_BUSCA_CHIRI =="Donde Hay piedras" |DONDE_BUSCA_CHIRI =="En las piedras" | DONDE_BUSCA_CHIRI =="En las pircas de piedras" |DONDE_BUSCA_CHIRI =="Piedras" |DONDE_BUSCA_CHIRI =="Piedras ", "piedras",
-                                                                                                         ifelse(DONDE_BUSCA_CHIRI =="No la buscaria" | DONDE_BUSCA_CHIRI =="No la buscaria porque no la conce" |  DONDE_BUSCA_CHIRI =="No sabe" |  DONDE_BUSCA_CHIRI =="No sabe " | DONDE_BUSCA_CHIRI =="Nose", "no sabe",
-                                                                                                                ifelse( DONDE_BUSCA_CHIRI =="Cuarto" | DONDE_BUSCA_CHIRI =="Cuartos" | DONDE_BUSCA_CHIRI =="Cuartos " | DONDE_BUSCA_CHIRI =="Las habitaciones", "cuartos",
-                                                                                                                        ifelse( DONDE_BUSCA_CHIRI =="Detras de cuadros" |  DONDE_BUSCA_CHIRI =="Detras de cuadros " |  DONDE_BUSCA_CHIRI =="Detras de muebles" |  DONDE_BUSCA_CHIRI =="Detrás de las cosas", "detras de cosas",
-                                                                                                                                ifelse(DONDE_BUSCA_CHIRI =="En el patio" |DONDE_BUSCA_CHIRI =="Patio", "patio",
-                                                                                                                                       ifelse(DONDE_BUSCA_CHIRI =="El techo" |DONDE_BUSCA_CHIRI =="En el techo" |DONDE_BUSCA_CHIRI =="En el techo " |DONDE_BUSCA_CHIRI =="En los techos" |DONDE_BUSCA_CHIRI =="Techos", "techos",
-                                                                                                                                              ifelse())))))))))))))
-              
-#create a data frame 
+#create a new data frame to more easily view work being done below
 data1<- as.data.frame(data[,c(1,12)])
-#filter donde busca chiri and create columns for words that are filtered
+#filter donde busca chiri and create columns for keywords that are filtered. 1 is given for participants that answer filtered keyword
 data1$animal <- as.integer(grepl("animales|animal", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
-data1$ladrillo <- as.integer(grepl("ladrillo|ladrillos|ladrllos", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$ladrillo <- as.integer(grepl("ladrillo|ladrillos|ladrllos|kadrillos", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$sillar <- as.integer(grepl("sillares|sillar", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
-data1$piedra <- as.integer(grepl("piedras|piedra", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$piedra <- as.integer(grepl("piedras|piedra|pidras", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$adobe <- as.integer(grepl("adobe", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$cama <- as.integer(grepl("cama|camas|colchones", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$detras <- as.integer(grepl("detras|detrás", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$patio <- as.integer(grepl("patio", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
-data1$cuarto <- as.integer(grepl("cuarto|cuartos|habitacion|habitaciones|dormitorio", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$cuarto <- as.integer(grepl("cuarto|cuartos|habitacion|habitaciones|dormitorio|vivienda", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$techo <- as.integer(grepl("techos|techo", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$tierra <- as.integer(grepl("tierra|chacra", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
-data1$grieta <- as.integer(grepl("grietas|grieta", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$grieta <- as.integer(grepl("grietas|grieta|grietad", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$rincon <- as.integer(grepl("rincon|rincones", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$humedo <- as.integer(grepl("humedo|humedos|humedad|húmedas|húmedos|humedas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
-data1$oscuro <- as.integer(grepl("oscuro|oscuros|oscura|oscuras", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$oscuro <- as.integer(grepl("oscuro|oscuros|oscura|oscuras|luz|oscuridad|oacuros", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$esquina <- as.integer(grepl("esquina|esquinas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$pared <- as.integer(grepl("pared|paredes", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$madera <- as.integer(grepl("maderas|madera", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
@@ -496,32 +476,104 @@ data1$guardadas <- as.integer(grepl("guardadas", data$DONDE_BUSCA_CHIRI, ignore.
 data1$basura <- as.integer(grepl("basura", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$bloqueta<- as.integer(grepl("bloqueta|bloquetas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$planta <- as.integer(grepl("planta|plantas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
-data1$pirca <- as.integer(grepl("pirca|pircado", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$pirca <- as.integer(grepl("pirca|pircado|pircas|pircados", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$cajones <- as.integer(grepl("cajones", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$almacen <- as.integer(grepl("almacen|almacenes", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$papel <- as.integer(grepl("papel|papeles", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$cuadro <- as.integer(grepl("cuadro|cuadros", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$descampado <- as.integer(grepl("descampado|descampados", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$taller <- as.integer(grepl("taller", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
-data1$no_mueven <- as.integer(grepl("mueven|movemos", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$no_mueven <- as.integer(grepl("mueven|movemos|mue", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$cocina <- as.integer(grepl("cocina", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$tabla <- as.integer(grepl("tabla|tablas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$deposito <- as.integer(grepl("deposito|depósitos", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$baño <- as.integer(grepl("baño|baños", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
 data1$agua <- as.integer(grepl("agua|aguas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$casa <- as.integer(grepl("casa|casas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$ventana <- as.integer(grepl("ventanas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$alfombra <- as.integer(grepl("alfombras", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$acampado <- as.integer(grepl("acampados", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$escombro <- as.integer(grepl("escombros|desmontes", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$mueble <- as.integer(grepl("mueble|muebles", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$escondido <- as.integer(grepl("escondidos|ocultas|esconden", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$seco <- as.integer(grepl("secos", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$agujero <- as.integer(grepl("agujeros", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$abandonado <- as.integer(grepl("abandonado|abandonada", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$no_estucar <- as.integer(grepl("estucar|estucadas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$cochera <- as.integer(grepl("cochera", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$comoda <- as.integer(grepl("comodas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$aves <- as.integer(grepl("aves", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$viejo <- as.integer(grepl("viejas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$ropero <- as.integer(grepl("roperos", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$oveja <- as.integer(grepl("ovejas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$estera <- as.integer(grepl("esteras", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$pasto <- as.integer(grepl("pasto", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$granja <- as.integer(grepl("granjas", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$grasa <- as.integer(grepl("grasa", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$establo <- as.integer(grepl("establo", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$piso <- as.integer(grepl("piso", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$desagues <- as.integer(grepl("desgues|desagüe", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+data1$trapos <- as.integer(grepl("trapos", data$DONDE_BUSCA_CHIRI, ignore.case = TRUE))
+
+
+#to make columns containing filtered words above. basically condensing columns from above
+data1$animales <- ifelse(data1$animal == 1 | data1$cuy == 1 | data1$perro == 1 | data1$conejo == 1 | data1$gallina == 1 | data1$corral == 1 | data1$pollo == 1 | data1$aves == 1 | data1$oveja == 1, 1, 0)
+data1$disorganizacion <- ifelse(data1$acumulado == 1 | data1$amontonada == 1 | data1$basura == 1 | data1$guardadas ==1 | data1$no_mueven == 1 | data1$viejo == 1 | data1$abandonado == 1, 1, 0)
+data1$tierras <- ifelse(data1$tierra == 1 | data1$jardin == 1 | data1$pasto == 1, 1, 0)
+data1$grietas <- ifelse(data1$grieta == 1 | data1$rendija == 1 | data1$hueco == 1 | data1$agujero == 1 | data1$no_estucar == 1, 1, 0)
+data1$sucios <- ifelse(data1$sucio == 1 | data1$no_limpia == 1 | data1$grasa == 1, 1, 0)
+data1$esquinas <- ifelse(data1$esquina == 1 | data1$rincon == 1, 1, 0)
+data1$NS <- ifelse(data1$no_sabe == 1, 1, 0)
+data1$ladrillos <- ifelse(data1$ladrillo == 1, 1, 0)
+data1$sillares <- ifelse(data1$sillar == 1, 1, 0)
+data1$piedras <- ifelse(data1$piedra == 1, 1, 0)
+data1$adobe <- ifelse(data1$adobe == 1, 1, 0)
+data1$bloquetas <- ifelse(data1$bloqueta == 1, 1, 0)
+data1$maderas <- ifelse(data1$madera == 1, 1, 0)
+data1$detras_cosas <- ifelse(data1$detras == 1, 1, 0)
+data1$en_casa <- ifelse(data1$tabla ==1 | data1$cajones == 1 | data1$pared == 1 | data1$baño == 1 | data1$cocina == 1 | data1$cuadro == 1 | data1$papel == 1 | data1$casa == 1 | data1$ropero == 1 | data1$comoda == 1 | data1$estera == 1 | data1$alfombra == 1 | data1$desagues == 1 | data1$trapos == 1 | data1$ventana == 1 | data1$mueble == 1 | data1$piso == 1, 1, 0)
+data1$humedos <- ifelse(data1$humedo == 1, 1, 0)
+data1$oscuros <- ifelse(data1$oscuro == 1, 1, 0)
+data1$patios <- ifelse(data1$patio == 1, 1, 0)
+data1$techos <- ifelse(data1$techo ==1, 1, 0)
+data1$cuartos <- ifelse(data1$cuarto ==1, 1, 0)
+data1$fuera_de_casa <- ifelse(data1$planta == 1 | data1$almacen == 1 | data1$descampado == 1 | data1$taller == 1 | data1$deposito == 1 | data1$agua == 1 | data1$granja == 1 | data1$establo == 1 | data1$escombro == 1 | data1$acampado == 1, 1, 0)
+data1$escondidos <- ifelse(data1$escondido == 1, 1, 0)
+data1$secos <- ifelse(data1$seco == 1, 1, 0)
+data1$camas <- ifelse(data1$cama == 1, 1, 0)
+data1$pircas <- ifelse(data1$pirca == 1, 1, 0)
 
 
 
+#to make one new column with categories for donde buscar chiris using the columns made above. 
+#NOTE not useful for what we want
+data1<- mutate(data1, CAT_DONDE_BUSCA = ifelse(animal == 1 | cuy == 1 | perro == 1 | conejo == 1 | gallina == 1 | corral == 1 | pollo == 1 | aves == 1 | oveja == 1, "animales",
+                                               ifelse(acumulado == 1 | amontonada == 1 | basura == 1 | guardadas ==1 | no_mueven == 1 | viejo == 1 | abandonado == 1, "disorganization", 
+                                                      ifelse(tierra == 1 | jardin == 1 | pasto == 1, "tierra", 
+                                                             ifelse(grieta == 1 | rendija == 1 | hueco == 1 | agujero == 1 | no_estucar == 1, "grietas",
+                                                                    ifelse(sucio == 1 | no_limpia == 1 | grasa == 1, "sucio",
+                                                                           ifelse(esquina == 1 | rincon == 1, "esquinas",
+                                                                                  ifelse(no_sabe == 1, "no sabe",
+                                                                                         ifelse(ladrillo == 1, "ladrillos",
+                                                                                                ifelse(sillar == 1, "sillares",
+                                                                                                       ifelse(piedra == 1, "piedras",
+                                                                                                              ifelse(adobe == 1, "adobe",
+                                                                                                                     ifelse(bloqueta == 1, "bloquetas",
+                                                                                                                            ifelse(madera == 1, "madera",
+                                                                                                                                   ifelse(detras == 1, "detras de cosas",
+                                                                                                                                          ifelse(tabla ==1 | cajones == 1 | pared == 1 | baño == 1 | cocina == 1 | cuadro == 1 | papel == 1 | casa == 1 | ropero == 1 | comoda == 1 | estera == 1 | alfombra == 1 | desagues == 1 | trapos == 1 | ventana == 1 | mueble == 1 | piso == 1, "en la casa",
+                                                                                                                                                 ifelse(humedo == 1, "humedo",
+                                                                                                                                                        ifelse(oscuro == 1, "oscuro",
+                                                                                                                                                               ifelse(patio == 1, "patio",
+                                                                                                                                                                      ifelse(techo == 1, "techo",
+                                                                                                                                                                             ifelse(cuarto == 1, "cuarto",
+                                                                                                                                                                                    ifelse(planta == 1 | almacen == 1 | descampado == 1 | taller == 1 | deposito == 1 | agua == 1 | granja == 1 | establo == 1 | escombro == 1 | acampado == 1, "fuera de la casa",
+                                                                                                                                                                                           ifelse(escondido == 1, "escondido",
+                                                                                                                                                                                                  ifelse(seco == 1, "seco",
+                                                                                                                                                                                                         ifelse(cama == 1, "cama",
+                                                                                                                                                                                                                ifelse(pirca == 1, "pirca", 0))))))))))))))))))))))))))
 
-
-
-
-
-
-
-
-
-
+                                                                                                                                                                                                
 
 
 
