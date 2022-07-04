@@ -8,7 +8,7 @@ library(tidyr)
 
 library(readr)
 #use this to read
-data <- read.csv("KAP-baseline-data/immune_survey_23-05-2022.csv", header=TRUE, sep=";")
+data <- read.csv("Immune/KAP-baseline-data/immune_survey_23-05-2022.csv", header=TRUE, sep=";")
 #Limpiar
 #ID 63: Unicode registrado como 1.1.69.16 debe ser cambiado a 1.13.69.16
 data$UNICODE[data$ID==63]<- "1.13.69.16"
@@ -193,9 +193,9 @@ data<- mutate(data, KNOWLEDGE_OF_DISEASE_TRANSMISSION=ifelse(CHIRI_TRANSMITIR_EN
                                                                                                                                                                                     ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "No se acuerda", "Si, pero no se acuerda", 0))))))))))))))))))))
 
 #collapse categories of what diseases are transmitted by chiris into correct/incorrect/NS_NR. these are out of those who said yes to chiri transmitir enfermedad. NS_NR refers to those who said yes chiris transmit disease, but didn't give an answer for what disease
-data<- mutate(data, DISEASE_TRANSMIT_CATS=ifelse(KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Chagas" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad peligrosa" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Crecimiento de organos" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad del corazón/pecho", "correct",
-                                                 ifelse(KNOWLEDGE_OF_DISEASE_TRANSMISSION == "no" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Tuberculosis" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Toxoplasma" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Paludismo" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Lesmidiasis" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Infección" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Dengue" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Alergia" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad del estomago" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Fiebre y otro" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Solo fiebre" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedades de la piel",
-                                                        ifelse(KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Si, pero no se acuerda" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Si, pero no sabe/responde", "NS_NR", 0))))
+data<- mutate(data, DISEASE_TRANSMIT_CATS=ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & (KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Chagas" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad peligrosa" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Crecimiento de organos" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad del corazón/pecho"), "correct",
+                                                 ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & (KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Tuberculosis" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Toxoplasma" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Paludismo" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Lesmidiasis" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Infección" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Dengue" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Alergia" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad del estomago" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Fiebre y otro" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Solo fiebre" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedades de la piel"), "incorrect",
+                                                        ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & (KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Si, pero no se acuerda" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Si, pero no sabe/responde"), "NS_NR", 0))))
 
 
 
@@ -442,17 +442,28 @@ data<- mutate(data, GOBIERNO_REGIONAL=ifelse(OTRO==1 & (QUIEN_HABLADO_CHIRI_OTRO
 data<- mutate(data, UNIVERSIDAD=ifelse(OTRO==1 & QUIEN_HABLADO_CHIRI_OTRO=="En la universidad ", 1, 0))
 #to make new column for perifoneo category from quien hablado chiri otro
 data<- mutate(data, PERIFONEO=ifelse(OTRO==1 & (QUIEN_HABLADO_CHIRI_OTRO=="En perifoneo" | QUIEN_HABLADO_CHIRI_OTRO=="Perifoneo"), 1, 0))
-#to make new column for amigo category from quien hablado chiri otro
+#to make new column for noticias category from quien hablado chiri otro
 data<- mutate(data, NOTICIAS=ifelse(OTRO==1 & (QUIEN_HABLADO_CHIRI_OTRO=="Noticias" | QUIEN_HABLADO_CHIRI_OTRO== "Noticias " | QUIEN_HABLADO_CHIRI_OTRO== "Por las noticias " | QUIEN_HABLADO_CHIRI_OTRO== "Propaganda en la television hace 4 anios aproximado" | QUIEN_HABLADO_CHIRI_OTRO== "Radio"), 1, 0))
 #to make new column for profesional salud from profesional salud column above plus quien hablado chiri otro
 data<- mutate(data, PROFESIONAL_SALUD_TOT=ifelse(PROFESIONAL_SALUD==1 | (QUIEN_HABLADO_CHIRI_OTRO== "Alguien que vino a su casa " | QUIEN_HABLADO_CHIRI_OTRO=="Hace mucho tiempo un grupo de extranjeros dieron charlas y tomaron muestra de sangre a los ninios de la I.E" | QUIEN_HABLADO_CHIRI_OTRO=="Inspector upch"), 1, 0))
 #to delete original profesional salud column created from quien hablado chiri
 data$PROFESIONAL_SALUD<-NULL
 
+#change NA to 0 in profesional_salud_tot
+data$PROFESIONAL_SALUD_TOT[is.na(data$PROFESIONAL_SALUD_TOT)] <- 0
+
 #collapse answers above to categories of profesional salud, vecino/familiar, other. *check to see if agente comunidad should be with profesional salud or with others
-data<- mutate(data, QUIEN_HABLADO_CATS=ifelse(PROFESIONAL_SALUD_TOT == 1, "profesional salud",
-                                              ifelse(VECINO == 1 | FAMILIAR == 1, "vecino/familiar",
-                                                     ifelse(COLEGIO == 1 | OTRO_HABLADO == 1 | CUANDO_FUMIGARON == 1 | GOBIERNO_REGIONAL == 1 | PERIFONEO == 1 | NOTICIAS == 1 | UNIVERSIDAD == 1 | AMIGO == 1, "other", 0))))
+data<- mutate(data, QUIEN_HABLADO_CATS=ifelse(VECINO == 1 | FAMILIAR == 1 |(VECINO == 1 & FAMILIAR == 1),"vecino_familiar",
+                                              ifelse(PROFESIONAL_SALUD_TOT == 1, "profesional salud",
+                                                     ifelse(COLEGIO == 1 | OTRO_HABLADO == 1 | CUANDO_FUMIGARON == 1 | GOBIERNO_REGIONAL == 1 | PERIFONEO == 1 | NOTICIAS == 1 | UNIVERSIDAD == 1 | AMIGO == 1 | AGENTE_COMUNIDAD == 1, "other", 0))))
+
+#collapse answers above to categories of profesional salud, vecino/familiar, other. *check to see if agente comunidad should be with profesional salud or with others
+#data<- mutate(data, QUIEN_HABLADO_CATS=ifelse(VECINO == 1 | FAMILIAR == 1 |(VECINO == 1 & FAMILIAR == 1),"vecino_familiar", 0))
+#data<- mutate(data, QUIEN_HABLADO_CATS=ifelse(PROFESIONAL_SALUD_TOT == 1 | (is.na(PROFESIONAL_SALUD_TOT)== FALSE) ,"profesional salud", 0))
+
+#data<- mutate(data, QUIEN_HABLADO_CATS=ifelse(is.na(PROFESIONAL_SALUD_TOT) == TRUE, 0 , 1))
+#ifelse(PROFESIONAL_SALUD_TOT == 0 | is.na(PROFESIONAL_SALUD_TOT), "profesional salud",
+                                                 #    ifelse(COLEGIO == 1 | OTRO_HABLADO == 1 | CUANDO_FUMIGARON == 1 | GOBIERNO_REGIONAL == 1 | PERIFONEO == 1 | NOTICIAS == 1 | UNIVERSIDAD == 1 | AMIGO == 1 | AGENTE_COMUNIDAD == 1, "other", 0))))
 
 
 #to extract one answer/word from the column for oido/visto chiri and make new column for each extracted word. 1 is given if extracted answer is present for participant
@@ -583,7 +594,8 @@ data1$pircas <- ifelse(data1$pirca == 1, 1, 0)
 #create a new column that collapses the categories from above into groups of "correct"(aligns with what the ministry of health tells people to look for/looks for), "incorrect"(could be accurate, but not what the ministry stresses), and ?
 #This should will place responses that contain the answer in the groups that have that (ex: response = "corrales de animales, lugares secos, debajo de cama" will go in the correct column bc it contains corrales de animales, which is "correct")
 data1<- mutate(data1, DONDE_BUSCA_CATS=ifelse(animales == 1 | disorganizacion == 1 | patios == 1 | techos == 1 | cuartos == 1, "correct-ministry",
-                                              ifelse()))
+                                              ifelse(ladrillos == 1 | sillares == 1 | piedras == 1 | adobe == 1 | bloquetas == 1 | maderas == 1, "building materials",
+                                                     )))
 
 #to make one new column with categories for donde buscar chiris using the columns made above. 
 #NOTE not useful for what we want
