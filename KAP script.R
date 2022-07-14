@@ -5,7 +5,6 @@ library (dplyr)
 library(tidyverse)
 library(lubridate)
 library(tidyr)
-
 library(readr)
 #use this to read
 data <- read.csv("Immune/KAP-baseline-data/immune_survey_23-05-2022.csv", header=TRUE, sep=";")
@@ -130,6 +129,10 @@ data<-mutate(data, AGECLASS= ifelse(EDAD<=31,"18-31",
                                     ifelse(EDAD<=45,"32-45",
                                            ifelse(EDAD<=59, "46-59",
                                                   ifelse(EDAD<=100, "60-100", "0")))))
+
+#making age groups for <=35 and >35
+data<-mutate(data, AGE35=ifelse(EDAD<=35, "<35",
+                                ifelse(EDAD>35, ">35", 0)))
 
 
 #combine answers to ACTA_ECONOMICA and ACTA_ECONOMICA_OTRO to one column
@@ -390,6 +393,11 @@ data$score_signs_10<-data$score_signs+10
 #for IQR, median, range of sign scores
 quantile(data$score_signs_10, na.rm=TRUE)
 
+#to view answers about if they've seen chirimiachas or signs in the last year, if they reported it, who they reported to, and if they came to confirm
+table(data$ULTIMO_ANIO_VIO_CHIRI)
+table(data$REPORTO_DENUNCIO_CHIRI)
+table(data$AQUIEN_REPORTO)
+table(data$VINIERON_CONFIRMAR_PRESENCIA_INSECTO)
 
 #to combine and categorize given answers for what would you do if you saw a chiri in your house and "other" answers in one new column
 #Decirle a su esposo es biologo and Si encuentra solo una la mata,si encuentra varias acudiria al centro de salud in "other"
@@ -403,6 +411,15 @@ data<-mutate(data, QUE_HARIA_CHIRIS=ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "atrapa
                                                                                    ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar la casa " | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpieza"| VIERA_CHIRI_CASA_QUE_HARIA_OTRO =="Hecho agua caliente"), "limpiar",
                                                                                           ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Decirle a su esposo es biologo" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Si encuentra solo una la mata,si encuentra varias acudiria al centro de salud"), "Others", 0))))))))))
 
+#view answers for what would you do if you saw chirimachas in your house
+table(data$SOSPECHAS_CHIRI_CASA_QUE_HARIA)
+
+#make categories for what would you do if you suspect chirimachas in your house
+data<- mutate(data, QUE_HARIA_SOSPECHAS_CS = ifelse(SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO == "Acudir al centrp de salud" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Acudiria al centro de salud" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Avisar al centro de salud" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Informo al cs" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Ir al centro de salud" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Iria al centro de salud" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria a centro de salud" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria al centro de salud" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria al Centro de Salud" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria al Centro de Salud " | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Reportaria a c3ntro de salud" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Voy al centro de salud", 1, 0))
+data<- mutate(data, QUE_HARIA_SOSPECHAS_PS = ifelse(SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO == "Acudiria ala posta" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Avisaria a la posta" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Avisaria a la posta " | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamar ala posta" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria a alguien de la posta" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria a la posta" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria ala posta", 1, 0))
+data<- mutate(data, QUE_HARIA_SOSPECHAS_LIMP_BUSC = ifelse(SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO == "Buscar" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Buscar hacer limpieza" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Buscaria " | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Buscaría en las paredes y ladrillos" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Buscaría en lugares donde hay cosas amontanadas" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Buscaria haciendo limpieza" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Buscaria limpiando" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Buscaria y haria limpieza" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Haria limpieza" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Haría limpieza" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Haría limpieza " | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Haria limpieza de la casa" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Haría limpieza en toda mi casa" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="La buscaria y fumigaria" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpiar" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpiar la casa " | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpiar mi casa " | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpiar y buscar patio " | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpiar y buscarla" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpiaria" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpiaria " | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpiaria y fumigaria" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpieza" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpieza " | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpieza de la casa" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpieza de toda la casa" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpieza profunda " | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpio la casa" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Mover todas las cosas" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Mueve las cosas" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Muevo todas las cosas" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Revision de la casa", 1, 0))
+data<- mutate(data, QUE_HARIA_SOSPECHAS_OTRO = ifelse(SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO == "Hecharia cal" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria al inspector sanitario" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria al senasa" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="No abrir las ventanas" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="La buscaria y fumigaria" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpiaria y fumigaria", 1, 0))
+data<- mutate(data, QUE_HARIA_SOSPECHAS_REPORT = ifelse(SOSPECHAS_CHIRI_CASA_QUE_HARIA == "reportaria" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO == "La reporto" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Reportaria al concejo", 1, 0))
      
                                                 
 #to combine and categorize answers for "what happens when you report chiris" and "other" answers in one new column
@@ -592,14 +609,46 @@ data1$camas <- ifelse(data1$cama == 1, 1, 0)
 data1$pircas <- ifelse(data1$pirca == 1, 1, 0)
 
 #create a new column that collapses the categories from above into groups of "correct"(aligns with what the ministry of health tells people to look for/looks for), "incorrect"(could be accurate, but not what the ministry stresses), and ?
-#This should will place responses that contain the answer in the groups that have that (ex: response = "corrales de animales, lugares secos, debajo de cama" will go in the correct column bc it contains corrales de animales, which is "correct")
-data1<- mutate(data1, DONDE_BUSCA_CATS=ifelse(animales == 1 | disorganizacion == 1 | patios == 1 | techos == 1 | cuartos == 1, "correct-ministry",
-                                              ifelse(ladrillos == 1 | sillares == 1 | piedras == 1 | adobe == 1 | bloquetas == 1 | maderas == 1, "building materials",
-                                                     )))
+#This should place responses that contain the answer in the groups that have that (ex: response = "corrales de animales, lugares secos, debajo de cama" will go in the correct column bc it contains corrales de animales, which is "correct")
+data1<- mutate(data1, DONDE_BUSCA_CATS=ifelse(animales == 1 | disorganizacion == 1 | patios == 1 | techos == 1 | cuartos == 1, "correct-ministry", "other"))
+
+#view answers to hace uso app
+table(data$HACE_USO_APP)
+
+#to extract one answer/word from hace uso app column. New column is created and 1 is given if extracted answer is present
+data<- data%>%mutate(FACEBOOK=grepl("facebook", HACE_USO_APP)*1)
+data<- data%>%mutate(INSTAGRAM=grepl("instagram", HACE_USO_APP)*1)
+data<- data%>%mutate(WHATSAPP=grepl("whatsapp", HACE_USO_APP)*1)
+data<- data%>%mutate(TIKTOK=grepl("tiktok", HACE_USO_APP)*1)
+data<- data%>%mutate(NINGUNA=grepl("ninguna_anteriores", HACE_USO_APP)*1)
+
+#view answers to ha visto imagen mostrada
+table(data$HA_VISTO_IMAGEN_MOSTRADA)
+
+#view answers to donde los ha visto
+table(data$VIO_IMAGEN_1)
+
+#view answers to donde los ha visto OTRO
+table(data$VIO_IMAGEN_1_OTRO)
+table(data$VIO_IMAGEN_2)
+table(data$VIO_IMAGEN_2_OTRO)
+table(data$VIO_IMAGEN_3)
+table(data$VIO_IMAGEN_3_OTRO)
+
+#group otro answers and make new column for each answer category
+#for vio_otro_cs one person gave two answers that go into this category (vio_imagen_1 and vio_imagen_2) so table(data$VIO_OTRO_CS) shows 10, but there are actually 11
+data<- mutate(data, VIO_OTRO_CS=ifelse(VIO_IMAGEN_1_OTRO == "C.s san Martín de socabaya "  | VIO_IMAGEN_1_OTRO == "C.s tiabaya" | VIO_IMAGEN_1_OTRO == "C.s. ampliación paucarpata " | VIO_IMAGEN_1_OTRO == "C.s. ciudad blanca" | VIO_IMAGEN_1_OTRO == "C.s. sabandia" | VIO_IMAGEN_1_OTRO == "C.s. Tiabaya" | VIO_IMAGEN_1_OTRO == "Centro de .Salud San Martin de Socabaya" | VIO_IMAGEN_1_OTRO == "Cs" | VIO_IMAGEN_1_OTRO == "Un afiche en un CS de Camana" | VIO_IMAGEN_1_OTRO == "Posta de San martin  cs.ciudad mi trabajo" | data$VIO_IMAGEN_2_OTRO == "Centro de Salud lara", 1, 0))
+#for vio_otro_ps one person gave two answers that go into this category (vio_imagen_1 and vio_imagen_2) so table(data$VIO_OTRO_PS) shows 26, but there are actually 27 
+data<- mutate(data, VIO_OTRO_PS=ifelse(VIO_IMAGEN_1_OTRO == "En la posta" | VIO_IMAGEN_1_OTRO == "P.s Villa San Juan" | VIO_IMAGEN_1_OTRO == "P.s. pampa de camarones" | VIO_IMAGEN_1_OTRO == "P.s. sabandia" | VIO_IMAGEN_1_OTRO == "P.s. sabandia " | VIO_IMAGEN_1_OTRO == "P.s. sachaca" | VIO_IMAGEN_1_OTRO == "P.s. san Juan " | VIO_IMAGEN_1_OTRO == "P.S. villa jesus" | VIO_IMAGEN_1_OTRO == "P.s. villa san juan" | VIO_IMAGEN_1_OTRO == "P.s. Villa San Juan" | VIO_IMAGEN_1_OTRO == "Posta" | VIO_IMAGEN_1_OTRO == "Posta de San martin  cs.ciudad mi trabajo" | VIO_IMAGEN_1_OTRO == "Posta Francisco Bolognesi" | VIO_IMAGEN_1_OTRO == "Socabaya ps lara" | VIO_IMAGEN_2_OTRO == "P.s. 4 de octubre " | VIO_IMAGEN_2_OTRO == "Posta", 1, 0))
+
+data<- mutate(data, VIO_OTRO_OTRO=ifelse(VIO_IMAGEN_1_OTRO == "En la television" | VIO_IMAGEN_1_OTRO == "En la televisión " | VIO_IMAGEN_1_OTRO == "Mercado Israel " | VIO_IMAGEN_1_OTRO == "No se acuerda el lugar exacto" | VIO_IMAGEN_1_OTRO == "Noticieros" | VIO_IMAGEN_1_OTRO == "Pegado en el gobierno regional" | VIO_IMAGEN_1_OTRO == "Pegado en un poste" | VIO_IMAGEN_1_OTRO == "Personal de salud " | VIO_IMAGEN_1_OTRO == "Por Socabaya pegado en un poste ,cuando visitaba un amigo" | VIO_IMAGEN_1_OTRO == "Television"| VIO_IMAGEN_1_OTRO == "Un Familiar le mostro un volante"  | VIO_IMAGEN_2_OTRO == "En los postes" | VIO_IMAGEN_3_OTRO == "En el cruce 3 de octubre", 1, 0 ))
+
+
+
 
 #to make one new column with categories for donde buscar chiris using the columns made above. 
 #NOTE not useful for what we want
-data1<- mutate(data1, CAT_DONDE_BUSCA = ifelse(animal == 1 | cuy == 1 | perro == 1 | conejo == 1 | gallina == 1 | corral == 1 | pollo == 1 | aves == 1 | oveja == 1, "animales",
+#data1<- mutate(data1, CAT_DONDE_BUSCA = ifelse(animal == 1 | cuy == 1 | perro == 1 | conejo == 1 | gallina == 1 | corral == 1 | pollo == 1 | aves == 1 | oveja == 1, "animales",
                                                ifelse(acumulado == 1 | amontonada == 1 | basura == 1 | guardadas ==1 | no_mueven == 1 | viejo == 1 | abandonado == 1, "disorganization", 
                                                       ifelse(tierra == 1 | jardin == 1 | pasto == 1, "tierra", 
                                                              ifelse(grieta == 1 | rendija == 1 | hueco == 1 | agujero == 1 | no_estucar == 1, "grietas",
@@ -626,6 +675,7 @@ data1<- mutate(data1, CAT_DONDE_BUSCA = ifelse(animal == 1 | cuy == 1 | perro ==
                                                                                                                                                                                                                 ifelse(pirca == 1, "pirca", 0))))))))))))))))))))))))))
 
                                                                                                                                                                                                 
+
 
 
 
