@@ -121,6 +121,9 @@ data <- data[which(data$ID!=624),]
 #ID 262 probablemente hubo un error con el app en la pregunta sobre que pasa cuando reportan chirimachas, a pesar de que se selecciono fumigan, aparece una respuesta en otros, por lo cual se va a dejar esa respuesta como NA
 data$SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO[data$ID==262]<- NA
 
+#gender distribution
+table(data$SEXO)
+
 #change age from chr to numeric
 data$EDAD<- as.numeric(data$EDAD)
 
@@ -399,6 +402,8 @@ table(data$REPORTO_DENUNCIO_CHIRI)
 table(data$AQUIEN_REPORTO)
 table(data$VINIERON_CONFIRMAR_PRESENCIA_INSECTO)
 
+#view answers to what would you do if you saw chiri in  house
+table(data$VIERA_CHIRI_CASA_QUE_HARIA)
 #to combine and categorize given answers for what would you do if you saw a chiri in your house and "other" answers in one new column
 #Decirle a su esposo es biologo and Si encuentra solo una la mata,si encuentra varias acudiria al centro de salud in "other"
 data<-mutate(data, QUE_HARIA_CHIRIS=ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "atraparia_centro_salud", "atraparia centro salud",
@@ -411,7 +416,7 @@ data<-mutate(data, QUE_HARIA_CHIRIS=ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "atrapa
                                                                                    ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar la casa " | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpieza"| VIERA_CHIRI_CASA_QUE_HARIA_OTRO =="Hecho agua caliente"), "limpiar",
                                                                                           ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Decirle a su esposo es biologo" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Si encuentra solo una la mata,si encuentra varias acudiria al centro de salud"), "Others", 0))))))))))
 
-#view answers for what would you do if you saw chirimachas in your house
+#view answers for what would you do if you suspect you have chirimachas in your house
 table(data$SOSPECHAS_CHIRI_CASA_QUE_HARIA)
 
 #make categories for what would you do if you suspect chirimachas in your house
@@ -421,7 +426,8 @@ data<- mutate(data, QUE_HARIA_SOSPECHAS_LIMP_BUSC = ifelse(SOSPECHAS_CHIRI_CASA_
 data<- mutate(data, QUE_HARIA_SOSPECHAS_OTRO = ifelse(SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO == "Hecharia cal" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria al inspector sanitario" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria al senasa" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="No abrir las ventanas" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="La buscaria y fumigaria" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Limpiaria y fumigaria" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Llamaria a inspector sanitario", 1, 0))
 data<- mutate(data, QUE_HARIA_SOSPECHAS_REPORT = ifelse(SOSPECHAS_CHIRI_CASA_QUE_HARIA == "reportaria" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO == "La reporto" | SOSPECHAS_CHIRI_CASA_QUE_HARIA_OTRO =="Reportaria al concejo", 1, 0))
      
-                                                
+#answers to what happens when you report chiris or signs of chiris in your house
+table(data$SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA)
 #to combine and categorize answers for "what happens when you report chiris" and "other" answers in one new column
 #other is "Le avisan si tiene alguna enfermedad y si son varias casas fumigan la cuadra"
 data<- mutate(data, QUE_PASA_REPORTE = ifelse(SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA == "fumigan" |(SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA=="otro"& SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO== "Vienen a matarlas "), "fumigan",
@@ -437,6 +443,8 @@ data<- mutate(data, REPORTE_CATS=ifelse(QUE_PASA_REPORTE == "fumigan" | QUE_PASA
                                         ifelse(QUE_PASA_REPORTE == "No hacen nada", "no hacen nada",
                                                ifelse(QUE_PASA_REPORTE == "NS_NR", "NS_NR", 0))))
 
+#view answer to has someone talked to you or have you seen or heard info about chiri
+table(data$HABLADO_OIDO_VISTO_CHIRI)
 
 #to extract one answer/word from the column for quien hablado chiri and make new column for each extracted word. 1 is given if extracted answer is present for participant
 data<- data%>%mutate(AGENTE_COMUNIDAD=grepl("agente_comunidad", QUIEN_HABLADO_CHIRI)*1)
@@ -612,6 +620,29 @@ data1$pircas <- ifelse(data1$pirca == 1, 1, 0)
 #This should place responses that contain the answer in the groups that have that (ex: response = "corrales de animales, lugares secos, debajo de cama" will go in the correct column bc it contains corrales de animales, which is "correct")
 data1<- mutate(data1, DONDE_BUSCA_CATS=ifelse(animales == 1 | disorganizacion == 1 | patios == 1 | techos == 1 | cuartos == 1, "correct-ministry", "other"))
 
+
+#view answers to do you know if chiris have been found in your zone recently and how did you hear about it
+table(data$RECIENTEMENTE_CHIRI_ZONA)
+table(data$COMO_ENTERADO)
+#either heard from neighbors or they found them
+table(data$COMO_ENTERADO_OTRO)
+
+#answers to questions about seeing ministerio de salud or ucph in neighborhood, if they knocked on the door, how long it has been, if they let them in/why not
+table(data$ESTE_ANIO_HA_VISTO_PERSONAL_SALUD)
+table(data$ULTIMO_ANIO_PERSONAL_SALUD_TOCO_PUERTA_CASA)
+table(data$HACE_CUANTO_TIEMPO_VISITARON)
+table(data$PERMITIO_INSPECTOR_INGRESE_CASA)
+table(data$RAZON_NO_PERMITIO_INSPECTOR_INGRESE_CASA)
+table(data$RAZON_NO_PERMITIO_INSPECTOR_INGRESE_CASA_OTRO)
+
+#answers to questions about using nearby bodegas
+table(data$VA_BODEGAS_CERCANAS)
+table(data$FRECUENCIA_COMPRA_BODEGA)
+
+#see if theres connection between going to bodegas a lot and seeing alerta chiri flyers/posters
+table(data$VA_BODEGAS_CERCANAS, data$HA_VISTO_IMAGEN_MOSTRADA)
+table(data$VA_BODEGAS_CERCANAS, data$VIO_IMAGEN_1)
+
 #view answers to hace uso app
 table(data$HACE_USO_APP)
 
@@ -640,41 +671,7 @@ table(data$VIO_IMAGEN_3_OTRO)
 data<- mutate(data, VIO_OTRO_CS=ifelse(VIO_IMAGEN_1_OTRO == "C.s san Martín de socabaya "  | VIO_IMAGEN_1_OTRO == "C.s tiabaya" | VIO_IMAGEN_1_OTRO == "C.s. ampliación paucarpata " | VIO_IMAGEN_1_OTRO == "C.s. ciudad blanca" | VIO_IMAGEN_1_OTRO == "C.s. sabandia" | VIO_IMAGEN_1_OTRO == "C.s. Tiabaya" | VIO_IMAGEN_1_OTRO == "Centro de .Salud San Martin de Socabaya" | VIO_IMAGEN_1_OTRO == "Cs" | VIO_IMAGEN_1_OTRO == "Un afiche en un CS de Camana" | VIO_IMAGEN_1_OTRO == "Posta de San martin  cs.ciudad mi trabajo" | data$VIO_IMAGEN_2_OTRO == "Centro de Salud lara", 1, 0))
 #for vio_otro_ps one person gave two answers that go into this category (vio_imagen_1 and vio_imagen_2) so table(data$VIO_OTRO_PS) shows 26, but there are actually 27 
 data<- mutate(data, VIO_OTRO_PS=ifelse(VIO_IMAGEN_1_OTRO == "En la posta" | VIO_IMAGEN_1_OTRO == "P.s Villa San Juan" | VIO_IMAGEN_1_OTRO == "P.s. pampa de camarones" | VIO_IMAGEN_1_OTRO == "P.s. sabandia" | VIO_IMAGEN_1_OTRO == "P.s. sabandia " | VIO_IMAGEN_1_OTRO == "P.s. sachaca" | VIO_IMAGEN_1_OTRO == "P.s. san Juan " | VIO_IMAGEN_1_OTRO == "P.S. villa jesus" | VIO_IMAGEN_1_OTRO == "P.s. villa san juan" | VIO_IMAGEN_1_OTRO == "P.s. Villa San Juan" | VIO_IMAGEN_1_OTRO == "Posta" | VIO_IMAGEN_1_OTRO == "Posta de San martin  cs.ciudad mi trabajo" | VIO_IMAGEN_1_OTRO == "Posta Francisco Bolognesi" | VIO_IMAGEN_1_OTRO == "Socabaya ps lara" | VIO_IMAGEN_2_OTRO == "P.s. 4 de octubre " | VIO_IMAGEN_2_OTRO == "Posta", 1, 0))
-
 data<- mutate(data, VIO_OTRO_OTRO=ifelse(VIO_IMAGEN_1_OTRO == "En la television" | VIO_IMAGEN_1_OTRO == "En la televisión " | VIO_IMAGEN_1_OTRO == "Mercado Israel " | VIO_IMAGEN_1_OTRO == "No se acuerda el lugar exacto" | VIO_IMAGEN_1_OTRO == "Noticieros" | VIO_IMAGEN_1_OTRO == "Pegado en el gobierno regional" | VIO_IMAGEN_1_OTRO == "Pegado en un poste" | VIO_IMAGEN_1_OTRO == "Personal de salud " | VIO_IMAGEN_1_OTRO == "Por Socabaya pegado en un poste ,cuando visitaba un amigo" | VIO_IMAGEN_1_OTRO == "Television"| VIO_IMAGEN_1_OTRO == "Un Familiar le mostro un volante"  | VIO_IMAGEN_2_OTRO == "En los postes" | VIO_IMAGEN_3_OTRO == "En el cruce 3 de octubre", 1, 0 ))
-
-
-
-
-#to make one new column with categories for donde buscar chiris using the columns made above. 
-#NOTE not useful for what we want
-#data1<- mutate(data1, CAT_DONDE_BUSCA = ifelse(animal == 1 | cuy == 1 | perro == 1 | conejo == 1 | gallina == 1 | corral == 1 | pollo == 1 | aves == 1 | oveja == 1, "animales",
-                                               ifelse(acumulado == 1 | amontonada == 1 | basura == 1 | guardadas ==1 | no_mueven == 1 | viejo == 1 | abandonado == 1, "disorganization", 
-                                                      ifelse(tierra == 1 | jardin == 1 | pasto == 1, "tierra", 
-                                                             ifelse(grieta == 1 | rendija == 1 | hueco == 1 | agujero == 1 | no_estucar == 1, "grietas",
-                                                                    ifelse(sucio == 1 | no_limpia == 1 | grasa == 1, "sucio",
-                                                                           ifelse(esquina == 1 | rincon == 1, "esquinas",
-                                                                                  ifelse(no_sabe == 1, "no sabe",
-                                                                                         ifelse(ladrillo == 1, "ladrillos",
-                                                                                                ifelse(sillar == 1, "sillares",
-                                                                                                       ifelse(piedra == 1, "piedras",
-                                                                                                              ifelse(adobe == 1, "adobe",
-                                                                                                                     ifelse(bloqueta == 1, "bloquetas",
-                                                                                                                            ifelse(madera == 1, "madera",
-                                                                                                                                   ifelse(detras == 1, "detras de cosas",
-                                                                                                                                          ifelse(tabla ==1 | cajones == 1 | pared == 1 | baño == 1 | cocina == 1 | cuadro == 1 | papel == 1 | casa == 1 | ropero == 1 | comoda == 1 | estera == 1 | alfombra == 1 | desagues == 1 | trapos == 1 | ventana == 1 | mueble == 1 | piso == 1, "en la casa",
-                                                                                                                                                 ifelse(humedo == 1, "humedo",
-                                                                                                                                                        ifelse(oscuro == 1, "oscuro",
-                                                                                                                                                               ifelse(patio == 1, "patio",
-                                                                                                                                                                      ifelse(techo == 1, "techo",
-                                                                                                                                                                             ifelse(cuarto == 1, "cuarto",
-                                                                                                                                                                                    ifelse(planta == 1 | almacen == 1 | descampado == 1 | taller == 1 | deposito == 1 | agua == 1 | granja == 1 | establo == 1 | escombro == 1 | acampado == 1, "fuera de la casa",
-                                                                                                                                                                                           ifelse(escondido == 1, "escondido",
-                                                                                                                                                                                                  ifelse(seco == 1, "seco",
-                                                                                                                                                                                                         ifelse(cama == 1, "cama",
-                                                                                                                                                                                                                ifelse(pirca == 1, "pirca", 0))))))))))))))))))))))))))
-
-                                                                                                                                                                                                
 
 
 
