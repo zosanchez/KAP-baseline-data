@@ -127,6 +127,20 @@ table(data$SEXO)
 #change age from chr to numeric
 data$EDAD<- as.numeric(data$EDAD)
 
+#find median age
+median_age<- median(data$EDAD)
+
+#IQR of age
+print(IQR(data$EDAD))
+quantile(data$EDAD)
+
+#Median age by sex
+aggregate(data$EDAD, list(data$SEXO), median)
+
+#IQR of age by sex
+aggregate(data$EDAD, list(data$SEXO), quantile)
+
+
 #making age groups. age groups based on range, IQR, median
 data<-mutate(data, AGECLASS= ifelse(EDAD<=31,"18-31",
                                     ifelse(EDAD<=45,"32-45",
@@ -646,6 +660,10 @@ table(data$VA_BODEGAS_CERCANAS, data$VIO_IMAGEN_1)
 #view answers to hace uso app
 table(data$HACE_USO_APP)
 
+#using apps vs age group
+table(data$HACE_USO_APP, data$AGE35)
+
+
 #to extract one answer/word from hace uso app column. New column is created and 1 is given if extracted answer is present
 data<- data%>%mutate(FACEBOOK=grepl("facebook", HACE_USO_APP)*1)
 data<- data%>%mutate(INSTAGRAM=grepl("instagram", HACE_USO_APP)*1)
@@ -653,17 +671,28 @@ data<- data%>%mutate(WHATSAPP=grepl("whatsapp", HACE_USO_APP)*1)
 data<- data%>%mutate(TIKTOK=grepl("tiktok", HACE_USO_APP)*1)
 data<- data%>%mutate(NINGUNA=grepl("ninguna_anteriores", HACE_USO_APP)*1)
 
+
+
 #view answers to ha visto imagen mostrada
 table(data$HA_VISTO_IMAGEN_MOSTRADA)
 
-#view answers to donde los ha visto
+#ha visto imagen by age group
+table(data$HA_VISTO_IMAGEN_MOSTRADA, data$AGE35)
+
+#view answers to donde los ha visto. vio imagen 1 and 2 contain all of the "facebook" answers. 
 table(data$VIO_IMAGEN_1)
+table(data$VIO_IMAGEN_2)
+table(data$VIO_IMAGEN_3)
+
+#donde los ha visto vs age class
+table(data$VIO_IMAGEN_1, data$AGE35)
+table(data$VIO_IMAGEN_2, data$AGE35)
+table(data$VIO_IMAGEN_3, data$AGE35)
+
 
 #view answers to donde los ha visto OTRO
 table(data$VIO_IMAGEN_1_OTRO)
-table(data$VIO_IMAGEN_2)
 table(data$VIO_IMAGEN_2_OTRO)
-table(data$VIO_IMAGEN_3)
 table(data$VIO_IMAGEN_3_OTRO)
 
 #group otro answers and make new column for each answer category
