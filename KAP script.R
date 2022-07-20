@@ -312,6 +312,11 @@ data$CHIRI_FECAL_TRAIL<-as.numeric(data$CHIRI_FECAL_TRAIL)
 #create column that sums all rows from vector columns. to see how many options participants chose
 data$sum_vector_ID=rowSums(data[,c("CHIRI_ADULTA","CHIRI_NIFA_3","CHIRI_NIFA_4_fl", "CHIRI_NINFA_4_alim","COREIDO","CHINCHE_CAMA","CHINCHE_HEDIONDA","CUCARACHA", "CHINCHE_CINTURON_AMARILLO","ESCARBAJO", "GORGOJO", "MOSCA")])
 
+#
+fisher.
+
+chisq.test()
+
 #create column that sums all rows from sign columns. to see how many options participants chose
 data$sum_sign_ID=rowSums(data[,c("CHIRI_FECAL_TRAILS","CHINCHE_CAMA_FECES","MOUSE_FECES", "MOLD","CHIRI_EGGS","CHIRI_FECAL_TRAIL")])
 
@@ -355,6 +360,9 @@ data<- mutate(data, INSECT_CATS=ifelse(vector_cat == "solo adulta" | vector_cat 
                                               ifelse(vector_cat == "incorrect only(1)" | vector_cat == "incorrect only(2)" | vector_cat == "incorrect only(3)" | vector_cat == "incorrect only(4)", "incorrect only",
                                                      ifelse(vector_cat == "adult+3ninf", "all 4 correct",
                                                             ifelse(vector_cat == "NS_NR", "NS_NR", 0))))))
+
+#table of insect_cats vs ageclass35
+insectIDvsage <- table(data$INSECT_CATS, data$AGE35)
 
 
 #create a new column that contains categories of answers to the SABES_SENIALES CHIRI question. (sumvectorID up to 3 = the highest number of signs selected amongst the participants is 3) 
@@ -429,6 +437,9 @@ data<-mutate(data, QUE_HARIA_CHIRIS=ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "atrapa
                                                                             ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "reportaria", "reportaria",
                                                                                    ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar la casa " | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpieza"| VIERA_CHIRI_CASA_QUE_HARIA_OTRO =="Hecho agua caliente"), "limpiar",
                                                                                           ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Decirle a su esposo es biologo" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Si encuentra solo una la mata,si encuentra varias acudiria al centro de salud"), "Others", 0))))))))))
+#table of que haria vs age35 - "correct" = atraparia centro salud + reportaria
+quehariavsage35 <- table(data$QUE_HARIA_CHIRIS, data$AGE35)
+
 
 #view answers for what would you do if you suspect you have chirimachas in your house
 table(data$SOSPECHAS_CHIRI_CASA_QUE_HARIA)
@@ -634,6 +645,9 @@ data1$pircas <- ifelse(data1$pirca == 1, 1, 0)
 #This should place responses that contain the answer in the groups that have that (ex: response = "corrales de animales, lugares secos, debajo de cama" will go in the correct column bc it contains corrales de animales, which is "correct")
 data1<- mutate(data1, DONDE_BUSCA_CATS=ifelse(animales == 1 | disorganizacion == 1 | patios == 1 | techos == 1 | cuartos == 1, "correct-ministry", "other"))
 
+#table of correct answers to where to find chiris vs age35
+wheretofindvsage <- table(data1$DONDE_BUSCA_CATS, data$AGE35)
+
 
 #view answers to do you know if chiris have been found in your zone recently and how did you hear about it
 table(data$RECIENTEMENTE_CHIRI_ZONA)
@@ -657,11 +671,14 @@ table(data$FRECUENCIA_COMPRA_BODEGA)
 table(data$VA_BODEGAS_CERCANAS, data$HA_VISTO_IMAGEN_MOSTRADA)
 table(data$VA_BODEGAS_CERCANAS, data$VIO_IMAGEN_1)
 
+bodegasvimagen <- table(data$VA_BODEGAS_CERCANAS, data$HA_VISTO_IMAGEN_MOSTRADA)[c(1,3),c(1,3)]
+fisher.test(bodegasvimagen)
+
 #view answers to hace uso app
 table(data$HACE_USO_APP)
 
 #using apps vs age group
-table(data$HACE_USO_APP, data$AGE35)
+haceappsvsage35 <- table(data$HACE_USO_APP, data$AGE35)
 
 
 #to extract one answer/word from hace uso app column. New column is created and 1 is given if extracted answer is present
@@ -676,6 +693,9 @@ data<- data%>%mutate(NINGUNA=grepl("ninguna_anteriores", HACE_USO_APP)*1)
 #view answers to ha visto imagen mostrada
 table(data$HA_VISTO_IMAGEN_MOSTRADA)
 
+#table ha visto imagen vs age35
+havistovsage35 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$AGE35)
+
 #ha visto imagen by age group
 table(data$HA_VISTO_IMAGEN_MOSTRADA, data$AGE35)
 
@@ -683,6 +703,10 @@ table(data$HA_VISTO_IMAGEN_MOSTRADA, data$AGE35)
 table(data$VIO_IMAGEN_1)
 table(data$VIO_IMAGEN_2)
 table(data$VIO_IMAGEN_3)
+
+#table vio imagen 1 and 2 vs age35 - to see results for facebook
+vioimagen1vsage35 <- table(data$VIO_IMAGEN_1, data$AGE35)
+vioimagen2vsage35 <- table(data$VIO_IMAGEN_2, data$AGE35)
 
 #donde los ha visto vs age class
 table(data$VIO_IMAGEN_1, data$AGE35)
