@@ -7,7 +7,12 @@ library(lubridate)
 library(tidyr)
 library(readr)
 #use this to read
-data <- read.csv("Immune/KAP-baseline-data/immune_survey_23-05-2022.csv", header=TRUE, sep=";")
+#don't know what happened here, this doesnt work for me anymore
+#data <- read.csv("Immune/KAP-baseline-data/immune_survey_23-05-2022.csv", header=TRUE, sep=";")
+
+data <- read_delim("~/Immune/KAP-baseline-data/immune_survey_23-05-2022.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE)
+data_catchments_complete <- read_csv("~/Immune/data_catchments_complete.csv")
+
 #Limpiar
 #ID 63: Unicode registrado como 1.1.69.16 debe ser cambiado a 1.13.69.16
 data$UNICODE[data$ID==63]<- "1.13.69.16"
@@ -121,8 +126,13 @@ data <- data[which(data$ID!=624),]
 #ID 262 probablemente hubo un error con el app en la pregunta sobre que pasa cuando reportan chirimachas, a pesar de que se selecciono fumigan, aparece una respuesta en otros, por lo cual se va a dejar esa respuesta como NA
 data$SABE_QUE_PASA_DENUNCIA_REPORTE_CHIRI_CASA_OTRO[data$ID==262]<- NA
 
+#merge cleaned immune_survey_23_05_2022 with data_catchments_complete by unicode
+data <- merge(data, data_catchments_complete, by= "UNICODE")
+
 #gender distribution
 table(data$SEXO)
+
+
 
 #change age from chr to numeric
 data$EDAD<- as.numeric(data$EDAD)
@@ -172,8 +182,8 @@ table(data$QUE_ENFERMEDADES_TRANSMITE_CHIRI)
 
 #to make a column for "other" answers to question about what disease chirimachas transmit.
 #"crecimiento de organos" and "enfermedad del corazón/pecho" could = Chagas, they might not have known the name 
-data<-mutate(data, OTHER_DISEASES=ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "No sé acuerda" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No recuerda el nombre" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda el nombre" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda. " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerdan", "No se acuerda",
-                                         ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enfermedad al corazón " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Enfermedad del corazón " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Enfermedad del pecho " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Enfermedad en el corazón " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Enfermedad en el pecho ", "Enfermedad del corazón/pecho",
+data<-mutate(data, OTHER_DISEASES=ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "No sé acuerda" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No recuerda el nombre" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda el nombre" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerda. " | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="No se acuerdan" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO== "No se acuerda.", "No se acuerda",
+                                         ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enfermedad al corazón" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enfermedad del corazón" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enfermedad del pecho" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enfermedad en el corazón" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enfermedad en el pecho", "Enfermedad de corazón_pecho",
                                                 ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enrojecimiento de la piel" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Picazon,hace heridas", "Enfermedades de la piel",
                                                        ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Fiebre" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Fiebrw", "Solo fiebre",
                                                               ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Fiebre ,diarrea" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Fiebre,malestar", "Fiebre y otro",
@@ -181,12 +191,13 @@ data<-mutate(data, OTHER_DISEASES=ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =
                                                                             ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Crecimiento de organos" | QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO =="Crecimiento del estomago", "Crecimiento de organos",
                                                                                    ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Alergia", "Alergia",
                                                                                           ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Dengue", "Dengue",
-                                                                                                 ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Infección ", "Infección",
+                                                                                                 ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Infección", "Infección",
                                                                                                         ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Lesmidiasis", "Lesmidiasis",
                                                                                                                ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Paludismo", "Paludismo",
                                                                                                                       ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Toxoplasma", "Toxoplasma",
                                                                                                                              ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Tuberculosis", "Tuberculosis",
-                                                                                                                                    ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enfermedad peligrosa ", "Enfermedad peligrosa", 0))))))))))))))))
+                                                                                                                                    ifelse(QUE_ENFERMEDADES_TRANSMITE_CHIRI_OTRO == "Enfermedad peligrosa", "Enfermedad peligrosa", 0))))))))))))))))
+
 
 
 
@@ -209,15 +220,25 @@ data<- mutate(data, KNOWLEDGE_OF_DISEASE_TRANSMISSION=ifelse(CHIRI_TRANSMITIR_EN
                                                                                                                                                         ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "Fiebre y otro", "Fiebre y otro",
                                                                                                                                                                ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "Solo fiebre", "Solo fiebre",
                                                                                                                                                                       ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "Enfermedades de la piel", "Enfermedades de la piel",
-                                                                                                                                                                             ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "Enfermedad del corazón/pecho", "Enfermedad del corazón/pecho",
+                                                                                                                                                                             ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "Enfermedad de corazón_pecho", "Enfermedad de corazón_pecho",
                                                                                                                                                                                     ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & QUE_ENFERMEDADES_TRANSMITE_CHIRI == "otro" & OTHER_DISEASES == "No se acuerda", "Si, pero no se acuerda", 0))))))))))))))))))))
 
 #collapse categories of what diseases are transmitted by chiris into correct/incorrect/NS_NR. these are out of those who said yes to chiri transmitir enfermedad. NS_NR refers to those who said yes chiris transmit disease, but didn't give an answer for what disease
-data<- mutate(data, DISEASE_TRANSMIT_CATS=ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & (KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Chagas" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad peligrosa" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Crecimiento de organos" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad del corazón/pecho"), "correct",
+data<- mutate(data, DISEASE_TRANSMIT_CATS=ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & (KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Chagas" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad peligrosa" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Crecimiento de organos" | OTHER_DISEASES== "Enfermedad de corazón_pecho"), "correct",
                                                  ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & (KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Tuberculosis" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Toxoplasma" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Paludismo" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Lesmidiasis" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Infección" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Dengue" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Alergia" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedad del estomago" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Fiebre y otro" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Solo fiebre" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Enfermedades de la piel"), "incorrect",
-                                                        ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & (KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Si, pero no se acuerda" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Si, pero no sabe/responde"), "NS_NR", 0))))
+                                                        ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "si" & (KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Si, pero no se acuerda" | KNOWLEDGE_OF_DISEASE_TRANSMISSION == "Si, pero no sabe/responde") | CHIRI_TRANSMITIR_ENFERMEDAD == "NS_NR", "NS_NR",
+                                                               ifelse(CHIRI_TRANSMITIR_ENFERMEDAD == "no", "no", 0)))))
 
 
+#change categories to 1 (correct, Chagas) and 0(incorrect, ns_nr)
+data<- mutate(data, DISEASE_TRANSMIT_10 = ifelse(DISEASE_TRANSMIT_CATS == "correct", 1, 0))
+
+#table disease transmitted by chiri vs age35
+diseasevsage35 <- table(data$DISEASE_TRANSMIT_10, data$AGE35)
+
+#check for significance of difference in age groups of knowledge that chagas is transmitted- fisher test/chi2 test
+fisher.test(diseasevsage35)
+chisq.test(diseasevsage35)
 
 #to create a new data base just with the variables you are going to use
 #df<- select(data, CUALES_PLACA_SON_CHIRI)
@@ -312,10 +333,7 @@ data$CHIRI_FECAL_TRAIL<-as.numeric(data$CHIRI_FECAL_TRAIL)
 #create column that sums all rows from vector columns. to see how many options participants chose
 data$sum_vector_ID=rowSums(data[,c("CHIRI_ADULTA","CHIRI_NIFA_3","CHIRI_NIFA_4_fl", "CHIRI_NINFA_4_alim","COREIDO","CHINCHE_CAMA","CHINCHE_HEDIONDA","CUCARACHA", "CHINCHE_CINTURON_AMARILLO","ESCARBAJO", "GORGOJO", "MOSCA")])
 
-#
-fisher.
 
-chisq.test()
 
 #create column that sums all rows from sign columns. to see how many options participants chose
 data$sum_sign_ID=rowSums(data[,c("CHIRI_FECAL_TRAILS","CHINCHE_CAMA_FECES","MOUSE_FECES", "MOLD","CHIRI_EGGS","CHIRI_FECAL_TRAIL")])
@@ -361,8 +379,18 @@ data<- mutate(data, INSECT_CATS=ifelse(vector_cat == "solo adulta" | vector_cat 
                                                      ifelse(vector_cat == "adult+3ninf", "all 4 correct",
                                                             ifelse(vector_cat == "NS_NR", "NS_NR", 0))))))
 
+
+
 #table of insect_cats vs ageclass35
 insectIDvsage <- table(data$INSECT_CATS, data$AGE35)
+
+#collapsing to show 1(adult correct) and 0(everything else)
+data<- mutate(data, INSECT_CAT_10=ifelse(INSECT_CATS == "adult correct", 1, 0))
+
+#table of insect_cats vs age35 just showing adultID
+insectIDvsage_adult <- table(data$INSECT_CAT_10, data$AGE35)
+#check for significance of difference in age groups - fisher test
+fisher.test(insectIDvsage_adult)
 
 
 #create a new column that contains categories of answers to the SABES_SENIALES CHIRI question. (sumvectorID up to 3 = the highest number of signs selected amongst the participants is 3) 
@@ -437,9 +465,17 @@ data<-mutate(data, QUE_HARIA_CHIRIS=ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "atrapa
                                                                             ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "reportaria", "reportaria",
                                                                                    ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar la casa " | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpieza"| VIERA_CHIRI_CASA_QUE_HARIA_OTRO =="Hecho agua caliente"), "limpiar",
                                                                                           ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Decirle a su esposo es biologo" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Si encuentra solo una la mata,si encuentra varias acudiria al centro de salud"), "Others", 0))))))))))
-#table of que haria vs age35 - "correct" = atraparia centro salud + reportaria
-quehariavsage35 <- table(data$QUE_HARIA_CHIRIS, data$AGE35)
 
+#change categories to 1 (correct, "atraparia centro salud" and "reportaria") and 0(everything else)
+data<- mutate(data, QUE_HARIA_10=ifelse(QUE_HARIA_CHIRIS == "atraparia centro salud" | QUE_HARIA_CHIRIS == "reportaria", 1, 0))
+
+
+#table of que haria vs age35 - "correct" = atraparia centro salud + reportaria
+quehariavsage35 <- table(data$QUE_HARIA_10, data$AGE35)
+
+#check for significance of difference in age groups of knowledge of what to do if you saw chiri in your house- fisher test/chi2 test
+fisher.test(quehariavsage35)
+chisq.test(quehariavsage35)
 
 #view answers for what would you do if you suspect you have chirimachas in your house
 table(data$SOSPECHAS_CHIRI_CASA_QUE_HARIA)
@@ -641,13 +677,16 @@ data1$secos <- ifelse(data1$seco == 1, 1, 0)
 data1$camas <- ifelse(data1$cama == 1, 1, 0)
 data1$pircas <- ifelse(data1$pirca == 1, 1, 0)
 
-#create a new column that collapses the categories from above into groups of "correct"(aligns with what the ministry of health tells people to look for/looks for), "incorrect"(could be accurate, but not what the ministry stresses), and ?
+#create a new column that collapses the categories from above into groups of "correct"(aligns with what the ministry of health tells people to look for/looks for), "incorrect"(could be accurate, but not what the ministry stresses)
 #This should place responses that contain the answer in the groups that have that (ex: response = "corrales de animales, lugares secos, debajo de cama" will go in the correct column bc it contains corrales de animales, which is "correct")
-data1<- mutate(data1, DONDE_BUSCA_CATS=ifelse(animales == 1 | disorganizacion == 1 | patios == 1 | techos == 1 | cuartos == 1, "correct-ministry", "other"))
+data1<- mutate(data1, DONDE_BUSCA_CATS=ifelse(animales == 1 | disorganizacion == 1 | patios == 1 | techos == 1 | cuartos == 1, 1, 0))
 
 #table of correct answers to where to find chiris vs age35
 wheretofindvsage <- table(data1$DONDE_BUSCA_CATS, data$AGE35)
 
+#check for significance of difference in age groups of where to find chiri- fisher test/chisq
+fisher.test(wheretofindvsage)
+chisq.test(wheretofindvsage)
 
 #view answers to do you know if chiris have been found in your zone recently and how did you hear about it
 table(data$RECIENTEMENTE_CHIRI_ZONA)
@@ -674,11 +713,20 @@ table(data$VA_BODEGAS_CERCANAS, data$VIO_IMAGEN_1)
 bodegasvimagen <- table(data$VA_BODEGAS_CERCANAS, data$HA_VISTO_IMAGEN_MOSTRADA)[c(1,3),c(1,3)]
 fisher.test(bodegasvimagen)
 
-#view answers to hace uso app
+
+
+#view answers to hace uso app - one answer = "whatsapp-nunguna anteriores" counted as ninguna_anteriores in this and following table
 table(data$HACE_USO_APP)
 
+#change categories to 1 (everything except ninguna_anteriores and whatsapp-ninguna_anteriores) and 0(ninguna_anteriores and whatsapp-ninguna_anteriores)
+data<- mutate(data, USO_APP_10=ifelse(HACE_USO_APP == "facebook" | HACE_USO_APP == "facebook-instagram-whatsapp" | HACE_USO_APP == "facebook-whatsapp" | HACE_USO_APP == "instagram-whatsapp" | HACE_USO_APP == "tiktok" | HACE_USO_APP == "facebook-instagram" | HACE_USO_APP == "facebook-instagram-whatsapp-tiktok" | HACE_USO_APP == "facebook-whatsapp-tiktok" | HACE_USO_APP == "whatsapp", 1, 0))
+
 #using apps vs age group
-haceappsvsage35 <- table(data$HACE_USO_APP, data$AGE35)
+haceappsvsage35 <- table(data$USO_APP_10, data$AGE35)
+
+#check for significance with age and using apps - fisher/chisq
+fisher.test(haceappsvsage35)
+chisq.test(haceappsvsage35)
 
 
 #to extract one answer/word from hace uso app column. New column is created and 1 is given if extracted answer is present
@@ -694,25 +742,31 @@ data<- data%>%mutate(NINGUNA=grepl("ninguna_anteriores", HACE_USO_APP)*1)
 table(data$HA_VISTO_IMAGEN_MOSTRADA)
 
 #table ha visto imagen vs age35
-havistovsage35 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$AGE35)
+havistovsage35 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$AGE35)[c(1,3),]
 
-#ha visto imagen by age group
-table(data$HA_VISTO_IMAGEN_MOSTRADA, data$AGE35)
+#check for significance of age differences and if you've seen alertachiri flyer
+fisher.test(havistovsage35)
+chisq.test(havistovsage35)
 
 #view answers to donde los ha visto. vio imagen 1 and 2 contain all of the "facebook" answers. 
 table(data$VIO_IMAGEN_1)
 table(data$VIO_IMAGEN_2)
 table(data$VIO_IMAGEN_3)
 
+#combine answers from vio imagen 1,2,3 to show 1(facebook) and 0 (everything else)
+data <- mutate(data, IMAGEN_10=ifelse(VIO_IMAGEN_1 == "facebook" | VIO_IMAGEN_2 == "facebook" | VIO_IMAGEN_3 == "facebook", 1, 0))
+
 #table vio imagen 1 and 2 vs age35 - to see results for facebook
-vioimagen1vsage35 <- table(data$VIO_IMAGEN_1, data$AGE35)
-vioimagen2vsage35 <- table(data$VIO_IMAGEN_2, data$AGE35)
+vioimagenvsage35 <- table(data$IMAGEN_10, data$AGE35)
+
+#check for significance with age groups and where you've seen alerta chiri flyer
+fisher.test(vioimagenvsage35)
+chisq.test(vioimagenvsage35)
 
 #donde los ha visto vs age class
 table(data$VIO_IMAGEN_1, data$AGE35)
 table(data$VIO_IMAGEN_2, data$AGE35)
 table(data$VIO_IMAGEN_3, data$AGE35)
-
 
 #view answers to donde los ha visto OTRO
 table(data$VIO_IMAGEN_1_OTRO)
@@ -726,6 +780,67 @@ data<- mutate(data, VIO_OTRO_CS=ifelse(VIO_IMAGEN_1_OTRO == "C.s san Martín de 
 data<- mutate(data, VIO_OTRO_PS=ifelse(VIO_IMAGEN_1_OTRO == "En la posta" | VIO_IMAGEN_1_OTRO == "P.s Villa San Juan" | VIO_IMAGEN_1_OTRO == "P.s. pampa de camarones" | VIO_IMAGEN_1_OTRO == "P.s. sabandia" | VIO_IMAGEN_1_OTRO == "P.s. sabandia " | VIO_IMAGEN_1_OTRO == "P.s. sachaca" | VIO_IMAGEN_1_OTRO == "P.s. san Juan " | VIO_IMAGEN_1_OTRO == "P.S. villa jesus" | VIO_IMAGEN_1_OTRO == "P.s. villa san juan" | VIO_IMAGEN_1_OTRO == "P.s. Villa San Juan" | VIO_IMAGEN_1_OTRO == "Posta" | VIO_IMAGEN_1_OTRO == "Posta de San martin  cs.ciudad mi trabajo" | VIO_IMAGEN_1_OTRO == "Posta Francisco Bolognesi" | VIO_IMAGEN_1_OTRO == "Socabaya ps lara" | VIO_IMAGEN_2_OTRO == "P.s. 4 de octubre " | VIO_IMAGEN_2_OTRO == "Posta", 1, 0))
 data<- mutate(data, VIO_OTRO_OTRO=ifelse(VIO_IMAGEN_1_OTRO == "En la television" | VIO_IMAGEN_1_OTRO == "En la televisión " | VIO_IMAGEN_1_OTRO == "Mercado Israel " | VIO_IMAGEN_1_OTRO == "No se acuerda el lugar exacto" | VIO_IMAGEN_1_OTRO == "Noticieros" | VIO_IMAGEN_1_OTRO == "Pegado en el gobierno regional" | VIO_IMAGEN_1_OTRO == "Pegado en un poste" | VIO_IMAGEN_1_OTRO == "Personal de salud " | VIO_IMAGEN_1_OTRO == "Por Socabaya pegado en un poste ,cuando visitaba un amigo" | VIO_IMAGEN_1_OTRO == "Television"| VIO_IMAGEN_1_OTRO == "Un Familiar le mostro un volante"  | VIO_IMAGEN_2_OTRO == "En los postes" | VIO_IMAGEN_3_OTRO == "En el cruce 3 de octubre", 1, 0 ))
 
+#start figuring out what characteristics help you identify chiris question - open ended question
+table(data$CARACT_AYUDAN_IDENTIFICAR_CHIRI)
+
+#create data frame to view more easily
+data2<- as.data.frame(data[,c(1,11)])
+
+data2$antenas <- as.integer(grepl("antena|antenas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$alargada <- as.integer(grepl("alargada|alargadito|largas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$alas <- as.integer(grepl("alas|ala", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$borde <- as.integer(grepl("borde|bordes", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$patas <- as.integer(grepl("pata|patas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$cabeza <- as.integer(grepl("cabeza|cabezas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$pico <- as.integer(grepl("pico|pica", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$caparazon <- as.integer(grepl("Caparazon", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$chupan_sangre <- as.integer(grepl("chupan|chupa", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$cola <- as.integer(grepl("cola", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$color <- as.integer(grepl("color|colores|colorr|calor|colo", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$plano <- as.integer(grepl("plano|plana|planita", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$redondo <- as.integer(grepl("redondo|redonda", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$espalda <- as.integer(grepl("espalda|espaldas|lomo|lomos|trasera|atras", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$tamano  <- as.integer(grepl("tamaño", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$rojo <- as.integer(grepl("rojo|roja|rojos|rojizo", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$amarillo <- as.integer(grepl("amarillo|amarillos|amarillas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$cafe <- as.integer(grepl("cafe", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$negro <- as.integer(grepl("negro|negra|negras|negritas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$animales <- as.integer(grepl("animal|animales", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$grande <- as.integer(grepl("grande|grandes", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$lineas <- as.integer(grepl("linea|lineas|líneas|raya|rayas|rayitas|franja|franjas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$ancha <- as.integer(grepl("ancha|anchas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$peligrosa <- as.integer(grepl("peligroso|peligrosa", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$infeccioso <- as.integer(grepl("infeccioso|infecciosa", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$forma <- as.integer(grepl("forma|formas|contextura", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$no_sabe <- as.integer(grepl("sabe|conoce|segura|recuerda|Ns", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$olor <- as.integer(grepl("olor", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$otros_insectos <- as.integer(grepl("cucarachas|cucaracha|pulga", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$cuerpo <- as.integer(grepl("cuerpo", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$panza <- as.integer(grepl("panza", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$foto <- as.integer(grepl("foto|fotos|libro", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$manchas <- as.integer(grepl("manchas|manchitas|mancha|marchitas|machitas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$sale_noche <- as.integer(grepl("noche|noches", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$enfermedad <- as.integer(grepl("enfermedad|mortal|chagas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$duras <- as.integer(grepl("dura|duras", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$verdes <- as.integer(grepl("verde|verdes", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$agua <- as.integer(grepl("agua|aguas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$seco <- as.integer(grepl("seco|secos", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$humedad <- as.integer(grepl("humedad", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$escondidas <- as.integer(grepl("escondido|escondida|escondidas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$vuela <- as.integer(grepl("vuela|vuelas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$rendijas <- as.integer(grepl("rendijas", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$puntos <- as.integer(grepl("puntos", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+data2$others <- as.integer(grepl("matas|capa|aparecen", data$CARACT_AYUDAN_IDENTIFICAR_CHIRI, ignore.case = TRUE))
+
+#collapsing categories to "correct" and incorrect
+data2<- mutate(data2, CARACT_CATS=ifelse(alargada == 1 | borde == 1 | plano == 1 | lineas == 1 | alas == 1 | amarillo == 1 | negro == 1, 1, 0))
+
+#table of correct answers characteristics to identify chiris vs age35
+characteristicsvsage <- table(data2$CARACT_CATS, data$AGE35)
+
+#check for significance of difference in age groups of characteristics to ID chiri- fisher test/chisq
+fisher.test(characteristicsvsage)
+chisq.test(characteristicsvsage)
 
 
 
