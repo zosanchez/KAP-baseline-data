@@ -463,7 +463,7 @@ data<-mutate(data, QUE_HARIA_CHIRIS=ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "atrapa
                                                               ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "nada", "nada",
                                                                      ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "NS_NR", "NS_NR",
                                                                             ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "reportaria", "reportaria",
-                                                                                   ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar la casa " | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpieza"| VIERA_CHIRI_CASA_QUE_HARIA_OTRO =="Hecho agua caliente"), "limpiar",
+                                                                                   ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar la casa " | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpiar la casa" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Limpieza"| VIERA_CHIRI_CASA_QUE_HARIA_OTRO =="Hecho agua caliente"), "limpiar",
                                                                                           ifelse(VIERA_CHIRI_CASA_QUE_HARIA == "otro" & (VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Decirle a su esposo es biologo" | VIERA_CHIRI_CASA_QUE_HARIA_OTRO == "Si encuentra solo una la mata,si encuentra varias acudiria al centro de salud"), "Others", 0))))))))))
 
 #change categories to 1 (correct, "atraparia centro salud" and "reportaria") and 0(everything else)
@@ -841,6 +841,80 @@ characteristicsvsage <- table(data2$CARACT_CATS, data$AGE35)
 #check for significance of difference in age groups of characteristics to ID chiri- fisher test/chisq
 fisher.test(characteristicsvsage)
 chisq.test(characteristicsvsage)
+
+#merge data, data1, data2
+data <- merge(data, data1, by= "UNICODE")
+data <- merge(data, data2, by= "UNICODE")
+
+
+#multivariate analysis
+#outcomes
+#1: Identifying a chiri (INSECT_CAT_10)= Dicotomic 
+#2: correctly respond to infestation (QUE_HARIA_10) = dicot
+#3: knows where to find (DONDE_BUSCA_CATS) = dicot
+
+#variables independientes
+#1: age groups (AGECLASS) = categorical
+#2: linked to social media (USO_APP_10) = dicot
+#3: education level (EDUCATION_CATS) = categorical
+#4: occupation (OCCUPATIONS) = categorical
+
+library(labeling)
+table(data$INSECT_CAT_10)
+table(data$QUE_HARIA_10)
+table(data$DONDE_BUSCA_CATS)
+table(data$AGECLASS)
+table(data$USO_APP_10)
+table(data$EDUCATION_CATS)
+table(data$OCCUPATIONS)
+
+
+# Modelo simple&crudo entre Reconoce Chiri y edad
+modelo.logit <- glm(INSECT_CAT_10 ~ AGECLASS, 
+                    data = data, family = "binomial")
+modelo.logit 
+
+coef(modelo.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between ID chiri and linked to social media
+modelo.logit3 <- glm(INSECT_CAT_10 ~ USO_APP_10, 
+                    data = data, family = "binomial")
+modelo.logit3 
+
+coef(modelo.logit3) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between ID chiri and education level
+modelo.logit4 <- glm(INSECT_CAT_10 ~ EDUCATION_CATS, 
+                     data = data, family = "binomial")
+modelo.logit4 
+
+coef(modelo.logit4) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between ID chiri and occupation
+modelo.logit5 <- glm(INSECT_CAT_10 ~ OCCUPATIONS, 
+                     data = data, family = "binomial")
+modelo.logit5 
+
+coef(modelo.logit5) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+# Modelo multivariado de factores asosiados a RECONOCE CHIRIMACHA
+
+modelo.logit2 <- glm(INSECT_CAT_10 ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS, 
+                    data = data, family = "binomial")
+modelo.logit2 
+
+coef(modelo.logit2) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
 
 
 
