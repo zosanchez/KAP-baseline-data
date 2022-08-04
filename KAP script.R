@@ -858,6 +858,7 @@ data <- merge(data, data2, by= "UNICODE")
 #2: linked to social media (USO_APP_10) = dicot
 #3: education level (EDUCATION_CATS) = categorical
 #4: occupation (OCCUPATIONS) = categorical
+#5: district (district) = categorical
 
 library(labeling)
 table(data$INSECT_CAT_10)
@@ -867,6 +868,7 @@ table(data$AGECLASS)
 table(data$USO_APP_10)
 table(data$EDUCATION_CATS)
 table(data$OCCUPATIONS)
+table(data$district)
 
 
 # Modelo simple&crudo entre Reconoce Chiri y edad
@@ -905,9 +907,18 @@ coef(modelo.logit5) %>%
   as_tibble() %>%
   mutate(odds = exp(value))
 
-# Modelo multivariado de factores asosiados a RECONOCE CHIRIMACHA
+#crude OR between ID chiri and district
+modelo.logit6 <- glm(INSECT_CAT_10 ~ district,
+                     data = data, family = "binomial")
+modelo.logit6
 
-modelo.logit2 <- glm(INSECT_CAT_10 ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS, 
+coef(modelo.logit6) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+## Modelo multivariado de factores asosiados a RECONOCE CHIRIMACHA
+
+modelo.logit2 <- glm(INSECT_CAT_10 ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS + district,
                     data = data, family = "binomial")
 modelo.logit2 
 
@@ -916,7 +927,115 @@ coef(modelo.logit2) %>%
   mutate(odds = exp(value))
 
 
+# Modelo simple&crudo entre correctly respond to infestation and ageclass
+report_age.logit <- glm(QUE_HARIA_10 ~ AGECLASS, 
+                    data = data, family = "binomial")
+report_age.logit 
 
+coef(report_age.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between correctly respond to infestation and linked to social media
+report_social.logit <- glm(QUE_HARIA_10 ~ USO_APP_10, 
+                     data = data, family = "binomial")
+report_social.logit 
+
+coef(report_social.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between correctly respond to infestation and education level
+report_education.logit <- glm(QUE_HARIA_10 ~ EDUCATION_CATS, 
+                     data = data, family = "binomial")
+report_education.logit 
+
+coef(report_education.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between correctly respond to infestation and occupation
+report_occupation.logit <- glm(QUE_HARIA_10 ~ OCCUPATIONS, 
+                     data = data, family = "binomial")
+report_occupation.logit 
+
+coef(report_occupation.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between correctly respond to infestation and district
+report_district.logit <- glm(QUE_HARIA_10 ~ district,
+                     data = data, family = "binomial")
+report_district.logit
+
+coef(report_district.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+## Modelo multivariado de factores asosiados a correctly respond to infestation
+
+report.logit <- glm(QUE_HARIA_10 ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS + district, 
+                     data = data, family = "binomial")
+report.logit 
+
+coef(report.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+# Modelo simple&crudo entre knows where to find chiri and ageclass
+search_age.logit <- glm(DONDE_BUSCA_CATS ~ AGECLASS, 
+                        data = data, family = "binomial")
+search_age.logit 
+
+coef(search_age.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between knows where to find chiri and linked to social media
+search_social.logit <- glm(DONDE_BUSCA_CATS ~ USO_APP_10, 
+                           data = data, family = "binomial")
+search_social.logit 
+
+coef(search_social.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between knows where to find chiri and education level
+search_education.logit <- glm(DONDE_BUSCA_CATS ~ EDUCATION_CATS, 
+                              data = data, family = "binomial")
+search_education.logit 
+
+coef(search_education.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between knows where to find chiri and occupation
+search_occupation.logit <- glm(DONDE_BUSCA_CATS ~ OCCUPATIONS, 
+                               data = data, family = "binomial")
+search_occupation.logit 
+
+coef(search_occupation.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+#crude OR between knows where to find chiri and district
+search_district.logit <- glm(DONDE_BUSCA_CATS ~ district,
+                             data = data, family = "binomial")
+search_district.logit
+
+coef(search_district.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+## Modelo multivariado de factores asosiados a knows where to find chiri
+
+search.logit <- glm(DONDE_BUSCA_CATS ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS + district, 
+                    data = data, family = "binomial")
+search.logit 
+
+coef(search.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
 
 
 #download data to excel file
