@@ -1038,5 +1038,12 @@ coef(search.logit) %>%
   mutate(odds = exp(value))
 
 
+
+#table for socia media to vector ID
+socialvsID <- table(data$USO_APP_10, data$INSECT_CAT_10)
+
+#fisher test for social media to vector ID
+fisher.test(socialvsID)
+
 #download data to excel file
 write.csv(data, file="C:/Users/zoeea/OneDrive/Documents/Immune/data from r.csv", row.names = FALSE)
