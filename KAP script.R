@@ -161,6 +161,35 @@ data<-mutate(data, AGECLASS= ifelse(EDAD<=31,"18-31",
 data<-mutate(data, AGE35=ifelse(EDAD<=35, "<35",
                                 ifelse(EDAD>35, ">35", 0)))
 
+#making age groups for ages that correspond to district sprays
+#Cayma - spray 2011. if 20 y/o in 2011, current >31
+data<- mutate(data, Cayma31=ifelse(EDAD>=31 & district == "Cayma", ">31",
+                                   ifelse(EDAD<31 & district == "Cayma", "<31", NA)))
+#Hunter - spray 2004. if 20 y/o in 2004, current >38
+data<- mutate(data, Hunter38=ifelse(EDAD>=38 & district == "Hunter", ">38",
+                                    ifelse(EDAD<38 & district == "Hunter", "<38", NA)))
+#JLBR - spray 2007. if 20 y/o in 2007, current >35
+data<- mutate(data, JLBR35=ifelse(EDAD>=35 & district == "Jose Luis Bustamante y Rivero", ">35", 
+                                  ifelse(EDAD<35 & district == "Jose Luis Bustamante y Rivero", "<35", NA)))
+#Miraflores - spray 2013.if 20y/o in 2013, current >29
+data<- mutate(data, Miraflores29=ifelse(EDAD>=29 & district == "Miraflores", ">29",
+                                        ifelse(EDAD<29 & district == "Miraflores", "<29", NA)))
+#Paucarpata - spray 2009. if 20y/o in 2009, current >33
+data<- mutate(data, Paucarpata33=ifelse(EDAD>=33 & district == "Paucarpata", ">33",
+                                        ifelse(EDAD<33 & district == "Paucarpata", "<33", NA)))
+#Sachaca - spray 2005. if 20y/o in 2005, current >37
+data<- mutate(data, Sachaca37=ifelse(EDAD>=37 & district == "Sachaca", ">37",
+                                     ifelse(EDAD<37 & district == "Sachaca", "<37", NA)))
+#Socabaya - spray 2006. if 20y/o in 2006, current >36
+data<- mutate(data, Socabaya36=ifelse(EDAD>=36 & district == "Socabaya", ">36", 
+                                      ifelse(EDAD<36 & district == "Socabaya", "<36", NA)))
+#Tiabaya - spray 2004. if 20y/o in 2004, current >38
+data<- mutate(data, Tiabaya38=ifelse(EDAD>=38 & district == "Tiabaya", ">38", 
+                                     ifelse(EDAD<38 & district == "Tiabaya", "<38", NA)))
+
+
+
+
 
 #combine answers to ACTA_ECONOMICA and ACTA_ECONOMICA_OTRO to one column
 data<-mutate(data, OCCUPATIONS=ifelse(ACT_ECONOMICA == "ama_casa", "ama_casa",
@@ -239,6 +268,58 @@ diseasevsage35 <- table(data$DISEASE_TRANSMIT_10, data$AGE35)
 #check for significance of difference in age groups of knowledge that chagas is transmitted- fisher test/chi2 test
 fisher.test(diseasevsage35)
 chisq.test(diseasevsage35)
+
+
+#comparing knowledge that chagas is transmitted to age groups of each district (age groups determined by years since spray + 20 years)
+#table of disease transmitted by chiri  vs Cayma31
+disease_Cayma31 <- table(data$DISEASE_TRANSMIT_10, data$Cayma31)
+disease_Cayma31
+#check for significance of difference in age groups - fisher test
+fisher.test(disease_Cayma31)
+
+#table of disease transmitted by chiri  vs Hunter38
+disease_Hunter38 <- table(data$DISEASE_TRANSMIT_10, data$Hunter38)
+disease_Hunter38
+#check for significance of difference in age groups - fisher test
+fisher.test(disease_Hunter38)
+
+#table of disease transmitted by chiri  vs JLBR35
+disease_JLBR35 <- table(data$DISEASE_TRANSMIT_10, data$JLBR35)
+disease_JLBR35
+#check for significance of difference in age groups - fisher test
+fisher.test(disease_JLBR35)
+
+#table of disease transmitted by chiri  vs Miraflores29
+disease_Miraflores29 <- table(data$DISEASE_TRANSMIT_10, data$Miraflores29)
+disease_Miraflores29
+#check for significance of difference in age groups - fisher test
+fisher.test(disease_Miraflores29)
+
+#table of disease transmitted by chiri  vs Paucarpata33
+disease_Paucarpata33 <- table(data$DISEASE_TRANSMIT_10, data$Paucarpata33)
+disease_Paucarpata33
+#check for significance of difference in age groups - fisher test
+fisher.test(disease_Paucarpata33)
+
+#table of disease transmitted by chiri  vs Sachaca37
+disease_Sachaca37 <- table(data$DISEASE_TRANSMIT_10, data$Sachaca37)
+disease_Sachaca37
+#check for significance of difference in age groups - fisher test
+fisher.test(disease_Sachaca37)
+
+#table of disease transmitted by chiri  vs Socabaya36
+disease_Socabaya36 <- table(data$DISEASE_TRANSMIT_10, data$Socabaya36)
+disease_Socabaya36
+#check for significance of difference in age groups - fisher test
+fisher.test(disease_Socabaya36)
+
+#table of disease transmitted by chiri  vs Tiabaya38
+disease_Tiabaya38 <- table(data$DISEASE_TRANSMIT_10, data$Tiabaya38)
+disease_Tiabaya38
+#check for significance of difference in age groups - fisher test
+fisher.test(disease_Tiabaya38)
+
+
 
 #to create a new data base just with the variables you are going to use
 #df<- select(data, CUALES_PLACA_SON_CHIRI)
@@ -392,6 +473,50 @@ insectIDvsage_adult <- table(data$INSECT_CAT_10, data$AGE35)
 #check for significance of difference in age groups - fisher test
 fisher.test(insectIDvsage_adult)
 
+#comparing insect ID to age groups of each district (age groups determined by years since spray + 20 years)
+#table of identifying adults vs Cayma31
+insectID_Cayma31 <- table(data$INSECT_CAT_10, data$Cayma31)
+#check for significance of difference in age groups - fisher test
+fisher.test(insectID_Cayma31)
+
+#table of identifying adults vs Hunter38
+insectID_Hunter38 <- table(data$INSECT_CAT_10, data$Hunter38)
+#check for significance of difference in age groups - fisher test
+fisher.test(insectID_Hunter38)
+
+#table of identifying adults vs JLBR35
+insectID_JLBR35 <- table(data$INSECT_CAT_10, data$JLBR35)
+#check for significance of difference in age groups - fisher test
+fisher.test(insectID_JLBR35)
+
+#table of identifying adults vs Miraflores29
+insectID_Miraflores29 <- table(data$INSECT_CAT_10, data$Miraflores29)
+#check for significance of difference in age groups - fisher test
+fisher.test(insectID_Miraflores29)
+
+#table of identifying adults vs Paucarpata33
+insectID_Paucarpata33 <- table(data$INSECT_CAT_10, data$Paucarpata33)
+#check for significance of difference in age groups - fisher test
+fisher.test(insectID_Paucarpata33)
+
+#table of identifying adults vs Sachaca37
+insectID_Sachaca37 <- table(data$INSECT_CAT_10, data$Sachaca37)
+insectID_Sachaca37
+#check for significance of difference in age groups - fisher test
+fisher.test(insectID_Sachaca37)
+
+#table of identifying adults vs Socabaya36
+insectID_Socabaya36 <- table(data$INSECT_CAT_10, data$Socabaya36)
+insectID_Socabaya36
+#check for significance of difference in age groups - fisher test
+fisher.test(insectID_Socabaya36)
+
+#table of identifying adults vs Tiabaya38
+insectID_Tiabaya38 <- table(data$INSECT_CAT_10, data$Tiabaya38)
+insectID_Tiabaya38
+#check for significance of difference in age groups - fisher test
+fisher.test(insectID_Tiabaya38)
+
 
 #create a new column that contains categories of answers to the SABES_SENIALES CHIRI question. (sumvectorID up to 3 = the highest number of signs selected amongst the participants is 3) 
 data<- mutate(data, sign_cat=ifelse(CHIRI_FECAL_TRAILS== 1 & sum_sign_ID== 1, "solo fecal trails",
@@ -476,6 +601,57 @@ quehariavsage35 <- table(data$QUE_HARIA_10, data$AGE35)
 #check for significance of difference in age groups of knowledge of what to do if you saw chiri in your house- fisher test/chi2 test
 fisher.test(quehariavsage35)
 chisq.test(quehariavsage35)
+
+
+#comparing knowledge of what to do if you saw chiri in your house to age groups of each district (age groups determined by years since spray + 20 years)
+#table of knowledge of what to do if chiri is in house  vs Cayma31
+queharia_Cayma31 <- table(data$QUE_HARIA_10, data$Cayma31)
+queharia_Cayma31
+#check for significance of difference in age groups - fisher test
+fisher.test(queharia_Cayma31)
+
+#table of knowledge of what to do if chiri is in house  vs Hunter38
+queharia_Hunter38 <- table(data$QUE_HARIA_10, data$Hunter38)
+queharia_Hunter38
+#check for significance of difference in age groups - fisher test
+fisher.test(queharia_Hunter38)
+
+#table of knowledge of what to do if chiri is in house vs JLBR35
+queharia_JLBR35 <- table(data$QUE_HARIA_10, data$JLBR35)
+queharia_JLBR35
+#check for significance of difference in age groups - fisher test
+fisher.test(queharia_JLBR35)
+
+#table of knowledge of what to do if chiri is in house vs Miraflores29
+queharia_Miraflores29 <- table(data$QUE_HARIA_10, data$Miraflores29)
+queharia_Miraflores29
+#check for significance of difference in age groups - fisher test
+fisher.test(queharia_Miraflores29)
+
+#table of knowledge of what to do if chiri is in house vs Paucarpata33
+queharia_Paucarpata33 <- table(data$QUE_HARIA_10, data$Paucarpata33)
+queharia_Paucarpata33
+#check for significance of difference in age groups - fisher test
+fisher.test(queharia_Paucarpata33)
+
+#table of knowledge of what to do if chiri is in house vs Sachaca37
+queharia_Sachaca37 <- table(data$QUE_HARIA_10, data$Sachaca37)
+queharia_Sachaca37
+#check for significance of difference in age groups - fisher test
+fisher.test(queharia_Sachaca37)
+
+#table of knowledge of what to do if chiri is in house vs Socabaya36
+queharia_Socabaya36 <- table(data$QUE_HARIA_10, data$Socabaya36)
+queharia_Socabaya36
+#check for significance of difference in age groups - fisher test
+fisher.test(queharia_Socabaya36)
+
+#table of knowledge of what to do if chiri is in house vs Tiabaya38
+queharia_Tiabaya38 <- table(data$QUE_HARIA_10, data$Tiabaya38)
+queharia_Tiabaya38
+#check for significance of difference in age groups - fisher test
+fisher.test(queharia_Tiabaya38)
+
 
 #view answers for what would you do if you suspect you have chirimachas in your house
 table(data$SOSPECHAS_CHIRI_CASA_QUE_HARIA)
@@ -687,6 +863,57 @@ wheretofindvsage <- table(data1$DONDE_BUSCA_CATS, data$AGE35)
 #check for significance of difference in age groups of where to find chiri- fisher test/chisq
 fisher.test(wheretofindvsage)
 chisq.test(wheretofindvsage)
+
+
+#comparing knowledge of where to find chiris on your property to age groups of each district (age groups determined by years since spray + 20 years)
+#table of knowledge of where to find chiri in house  vs Cayma31
+wheretofind_Cayma31 <- table(data$DONDE_BUSCA_CATS, data$Cayma31)
+wheretofind_Cayma31
+#check for significance of difference in age groups - fisher test
+fisher.test(wheretofind_Cayma31)
+
+#table of knowledge of where to find chiri in house  vs Hunter38
+wheretofind_Hunter38 <- table(data$DONDE_BUSCA_CATS, data$Hunter38)
+wheretofind_Hunter38
+#check for significance of difference in age groups - fisher test
+fisher.test(wheretofind_Hunter38)
+
+#table of knowledge of where to find chiri in house  vs JLBR35
+wheretofind_JLBR35 <- table(data$DONDE_BUSCA_CATS, data$JLBR35)
+wheretofind_JLBR35
+#check for significance of difference in age groups - fisher test
+fisher.test(wheretofind_JLBR35)
+
+#table of knowledge of where to find chiri in house  vs Miraflores29
+wheretofind_Miraflores29 <- table(data$DONDE_BUSCA_CATS, data$Miraflores29)
+wheretofind_Miraflores29
+#check for significance of difference in age groups - fisher test
+fisher.test(wheretofind_Miraflores29)
+
+#table of knowledge of where to find chiri in house  vs Paucarpata33
+wheretofind_Paucarpata33 <- table(data$DONDE_BUSCA_CATS, data$Paucarpata33)
+wheretofind_Paucarpata33
+#check for significance of difference in age groups - fisher test
+fisher.test(wheretofind_Paucarpata33)
+
+#table of knowledge of where to find chiri in house  vs Sachaca37
+wheretofind_Sachaca37 <- table(data$DONDE_BUSCA_CATS, data$Sachaca37)
+wheretofind_Sachaca37
+#check for significance of difference in age groups - fisher test
+fisher.test(wheretofind_Sachaca37)
+
+#table of knowledge of where to find chiri in house  vs Socabaya36
+wheretofind_Socabaya36 <- table(data$DONDE_BUSCA_CATS, data$Socabaya36)
+wheretofind_Socabaya36
+#check for significance of difference in age groups - fisher test
+fisher.test(wheretofind_Socabaya36)
+
+#table of knowledge of where to find chiri in house  vs Tiabaya38
+wheretofind_Tiabaya38 <- table(data$DONDE_BUSCA_CATS, data$Tiabaya38)
+wheretofind_Tiabaya38
+#check for significance of difference in age groups - fisher test
+fisher.test(wheretofind_Tiabaya38)
+
 
 #view answers to do you know if chiris have been found in your zone recently and how did you hear about it
 table(data$RECIENTEMENTE_CHIRI_ZONA)
