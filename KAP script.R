@@ -161,6 +161,9 @@ data<-mutate(data, AGECLASS= ifelse(EDAD<=31,"18-31",
 data<-mutate(data, AGE35=ifelse(EDAD<=35, "<35",
                                 ifelse(EDAD>35, ">35", 0)))
 
+#dist of people in each ditrict
+table(data$district)
+
 #making age groups for ages that correspond to district sprays
 #Cayma - spray 2011. if 20 y/o in 2011, current >31
 data<- mutate(data, Cayma31=ifelse(EDAD>=31 & district == "Cayma", ">31",
