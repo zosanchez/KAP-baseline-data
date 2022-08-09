@@ -476,6 +476,7 @@ fisher.test(insectIDvsage_adult)
 #comparing insect ID to age groups of each district (age groups determined by years since spray + 20 years)
 #table of identifying adults vs Cayma31
 insectID_Cayma31 <- table(data$INSECT_CAT_10, data$Cayma31)
+insectID_Cayma31
 #check for significance of difference in age groups - fisher test
 fisher.test(insectID_Cayma31)
 
@@ -975,6 +976,57 @@ havistovsage35 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$AGE35)[c(1,3),]
 fisher.test(havistovsage35)
 chisq.test(havistovsage35)
 
+
+#comparing if you've seen alertachiri flyer to age groups of each district (age groups determined by years since spray + 20 years)
+#table of if you've seen alertachiri flyer  vs Cayma31
+havisto_Cayma31 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$Cayma31)[c(1,3),]
+havisto_Cayma31
+#check for significance of difference in age groups - fisher test
+fisher.test(havisto_Cayma31)
+
+#table of if you've seen alertachiri flyer vs Hunter38
+havisto_Hunter38 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$Hunter38)[c(1,3),]
+havisto_Hunter38
+#check for significance of difference in age groups - fisher test
+fisher.test(havisto_Hunter38)
+
+#table of if you've seen alertachiri flyer vs JLBR35
+havisto_JLBR35 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$JLBR35)[c(1,3),]
+havisto_JLBR35
+#check for significance of difference in age groups - fisher test
+fisher.test(havisto_JLBR35)
+
+#table of if you've seen alertachiri flyer vs Miraflores29
+havisto_Miraflores29 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$Miraflores29)[c(1,3),]
+havisto_Miraflores29
+#check for significance of difference in age groups - fisher test
+fisher.test(havisto_Miraflores29)
+
+#table of if you've seen alertachiri flyer vs Paucarpata33
+havisto_Paucarpata33 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$Paucarpata33)[c(1,3),]
+havisto_Paucarpata33
+#check for significance of difference in age groups - fisher test
+fisher.test(havisto_Paucarpata33)
+
+#table of if you've seen alertachiri flyer vs Sachaca37
+havisto_Sachaca37 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$Sachaca37)[c(1,3),]
+havisto_Sachaca37
+#check for significance of difference in age groups - fisher test
+fisher.test(havisto_Sachaca37)
+
+#table ofif you've seen alertachiri flyer vs Socabaya36
+havisto_Socabaya36 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$Socabaya36)[c(1,3),]
+havisto_Socabaya36
+#check for significance of difference in age groups - fisher test
+fisher.test(havisto_Socabaya36)
+
+#table of if you've seen alertachiri flyer vs Tiabaya38
+havisto_Tiabaya38 <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$Tiabaya38)[c(1,3),]
+havisto_Tiabaya38
+#check for significance of difference in age groups - fisher test
+fisher.test(havisto_Tiabaya38)
+
+
 #view answers to donde los ha visto. vio imagen 1 and 2 contain all of the "facebook" answers. 
 table(data$VIO_IMAGEN_1)
 table(data$VIO_IMAGEN_2)
@@ -989,6 +1041,57 @@ vioimagenvsage35 <- table(data$IMAGEN_10, data$AGE35)
 #check for significance with age groups and where you've seen alerta chiri flyer
 fisher.test(vioimagenvsage35)
 chisq.test(vioimagenvsage35)
+
+
+#comparing if you've seen alertachiri flyer on facebook to age groups of each district (age groups determined by years since spray + 20 years)
+#table of if you've seen alertachiri flyer on facebook  vs Cayma31
+vioimagen_Cayma31 <- table(data$IMAGEN_10, data$Cayma31)
+vioimagen_Cayma31
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Cayma31)
+
+#table of if you've seen alertachiri flyer on facebook vs Hunter38
+vioimagen_Hunter38 <- table(data$IMAGEN_10, data$Hunter38)
+vioimagen_Hunter38
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Hunter38)
+
+#table of if you've seen alertachiri flyer on facebook vs JLBR35
+vioimagen_JLBR35 <- table(data$IMAGEN_10, data$JLBR35)
+vioimagen_JLBR35
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_JLBR35)
+
+#table of if you've seen alertachiri flyer on facebook vs Miraflores29
+vioimagen_Miraflores29 <- table(data$IMAGEN_10, data$Miraflores29)
+vioimagen_Miraflores29
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Miraflores29)
+
+#table of if you've seen alertachiri flyer on facebook vs Paucarpata33
+vioimagen_Paucarpata33 <- table(data$IMAGEN_10, data$Paucarpata33)
+vioimagen_Paucarpata33
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Paucarpata33)
+
+#table of if you've seen alertachiri flyer on facebook vs Sachaca37
+vioimagen_Sachaca37 <- table(data$IMAGEN_10, data$Sachaca37)
+vioimagen_Sachaca37
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Sachaca37)
+
+#table ofif you've seen alertachiri flyer on facebook vs Socabaya36
+vioimagen_Socabaya36 <- table(data$IMAGEN_10, data$Socabaya36)
+vioimagen_Socabaya36
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Socabaya36)
+
+#table of if you've seen alertachiri flyer on facebook vs Tiabaya38
+vioimagen_Tiabaya38 <- table(data$IMAGEN_10, data$Tiabaya38)
+vioimagen_Tiabaya38
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Tiabaya38)
+
 
 #donde los ha visto vs age class
 table(data$VIO_IMAGEN_1, data$AGE35)
@@ -1068,6 +1171,123 @@ characteristicsvsage <- table(data2$CARACT_CATS, data$AGE35)
 #check for significance of difference in age groups of characteristics to ID chiri- fisher test/chisq
 fisher.test(characteristicsvsage)
 chisq.test(characteristicsvsage)
+
+
+#comparing if you know correct characteristics of of chiri to age groups of each district (age groups determined by years since spray + 20 years)
+#table of if you know correct characteristics of of chiri  vs Cayma31
+character_Cayma31 <- table(data$CARACT_CATS, data$Cayma31)
+character_Cayma31
+#check for significance of difference in age groups - fisher test
+fisher.test(character_Cayma31)
+
+#table of if you know correct characteristics of of chiri  vs Hunter38
+character_Hunter38 <- table(data$CARACT_CATS, data$Hunter38)
+character_Hunter38
+#check for significance of difference in age groups - fisher test
+fisher.test(character_Hunter38)
+
+#table of if you know correct characteristics of of chiri  vs JLBR35
+character_JLBR35 <- table(data$CARACT_CATS, data$JLBR35)
+character_JLBR35
+#check for significance of difference in age groups - fisher test
+fisher.test(character_JLBR35)
+
+#table of if you know correct characteristics of of chiri  vs Miraflores29
+character_Miraflores29 <- table(data$CARACT_CATS, data$Miraflores29)
+character_Miraflores29
+#check for significance of difference in age groups - fisher test
+fisher.test(character_Miraflores29)
+
+#table of if you know correct characteristics of of chiri vs Paucarpata33
+character_Paucarpata33 <- table(data$CARACT_CATS, data$Paucarpata33)
+character_Paucarpata33
+#check for significance of difference in age groups - fisher test
+fisher.test(character_Paucarpata33)
+
+#table of if you know correct characteristics of of chiri vs Sachaca37
+character_Sachaca37 <- table(data$CARACT_CATS, data$Sachaca37)
+character_Sachaca37
+#check for significance of difference in age groups - fisher test
+fisher.test(character_Sachaca37)
+
+#table ofif you know correct characteristics of of chiri  vs Socabaya36
+character_Socabaya36 <- table(data$CARACT_CATS, data$Socabaya36)
+character_Socabaya36
+#check for significance of difference in age groups - fisher test
+fisher.test(character_Socabaya36)
+
+#table of if you know correct characteristics of of chiri  vs Tiabaya38
+character_Tiabaya38 <- table(data$CARACT_CATS, data$Tiabaya38)
+character_Tiabaya38
+#check for significance of difference in age groups - fisher test
+fisher.test(character_Tiabaya38)
+
+
+#view answers to donde los ha visto. vio imagen 1 and 2 contain all of the "facebook" answers. 
+table(data$VIO_IMAGEN_1)
+table(data$VIO_IMAGEN_2)
+table(data$VIO_IMAGEN_3)
+
+#combine answers from vio imagen 1,2,3 to show 1(facebook) and 0 (everything else)
+data <- mutate(data, IMAGEN_10=ifelse(VIO_IMAGEN_1 == "facebook" | VIO_IMAGEN_2 == "facebook" | VIO_IMAGEN_3 == "facebook", 1, 0))
+
+#table vio imagen 1 and 2 vs age35 - to see results for facebook
+vioimagenvsage35 <- table(data$IMAGEN_10, data$AGE35)
+
+#check for significance with age groups and where you've seen alerta chiri flyer
+fisher.test(vioimagenvsage35)
+chisq.test(vioimagenvsage35)
+
+
+#comparing if you've seen alertachiri flyer on facebook to age groups of each district (age groups determined by years since spray + 20 years)
+#table of if you've seen alertachiri flyer on facebook  vs Cayma31
+vioimagen_Cayma31 <- table(data$IMAGEN_10, data$Cayma31)
+vioimagen_Cayma31
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Cayma31)
+
+#table of if you've seen alertachiri flyer on facebook vs Hunter38
+vioimagen_Hunter38 <- table(data$IMAGEN_10, data$Hunter38)
+vioimagen_Hunter38
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Hunter38)
+
+#table of if you've seen alertachiri flyer on facebook vs JLBR35
+vioimagen_JLBR35 <- table(data$IMAGEN_10, data$JLBR35)
+vioimagen_JLBR35
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_JLBR35)
+
+#table of if you've seen alertachiri flyer on facebook vs Miraflores29
+vioimagen_Miraflores29 <- table(data$IMAGEN_10, data$Miraflores29)
+vioimagen_Miraflores29
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Miraflores29)
+
+#table of if you've seen alertachiri flyer on facebook vs Paucarpata33
+vioimagen_Paucarpata33 <- table(data$IMAGEN_10, data$Paucarpata33)
+vioimagen_Paucarpata33
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Paucarpata33)
+
+#table of if you've seen alertachiri flyer on facebook vs Sachaca37
+vioimagen_Sachaca37 <- table(data$IMAGEN_10, data$Sachaca37)
+vioimagen_Sachaca37
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Sachaca37)
+
+#table ofif you've seen alertachiri flyer on facebook vs Socabaya36
+vioimagen_Socabaya36 <- table(data$IMAGEN_10, data$Socabaya36)
+vioimagen_Socabaya36
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Socabaya36)
+
+#table of if you've seen alertachiri flyer on facebook vs Tiabaya38
+vioimagen_Tiabaya38 <- table(data$IMAGEN_10, data$Tiabaya38)
+vioimagen_Tiabaya38
+#check for significance of difference in age groups - fisher test
+fisher.test(vioimagen_Tiabaya38)
+
 
 #merge data, data1, data2
 data <- merge(data, data1, by= "UNICODE")
