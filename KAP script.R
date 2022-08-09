@@ -191,6 +191,19 @@ data<- mutate(data, Tiabaya38=ifelse(EDAD>=38 & district == "Tiabaya", ">38",
                                      ifelse(EDAD<38 & district == "Tiabaya", "<38", NA)))
 
 
+##districts with total spray: Hunter, JLBR, Paucarpata, Sachaca, Socabaya, Tiabaya
+##districts with focalized spray: Cayma, Miraflores
+#make column that categorizes districts into those that had total spray and those with focalized
+data<- mutate(data, spray_type=ifelse(district == "Hunter" | district == "Jose Luis Bustamante y Rivero" | district == "Paucarpata" | district == "Sachaca" | district == "Socabaya" | district == "Tiabaya", "total", "focalized"))
+
+
+##districts with a lot of surveillance post spray - Cayma, Hunter
+##districts with irregular surveillance post spray - Miraflores, Socabaya
+##districts with no surveillance post spray - JLBR, Paucarpata, Sachaca, Tiabaya
+data<- mutate(data, surveillance_type=ifelse(district == "Cayma" | district == "Hunter", "high",
+                                            ifelse(district == "Miraflores" | district == "Socabaya", "irregular",
+                                                   ifelse(district == "Jose Luis Bustamante y Rivero" | district == "Paucarpata" | district == "Sachaca" | district == "Tiabaya", "none", 0))))
+
 
 
 
