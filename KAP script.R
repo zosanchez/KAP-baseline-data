@@ -196,6 +196,43 @@ data<- mutate(data, Tiabaya38=ifelse(EDAD>=38 & district == "Tiabaya", ">38",
 #make column that categorizes districts into those that had total spray and those with focalized
 data<- mutate(data, spray_type=ifelse(district == "Hunter" | district == "Jose Luis Bustamante y Rivero" | district == "Paucarpata" | district == "Sachaca" | district == "Socabaya" | district == "Tiabaya", "total", "focalized"))
 
+#tables of knowledge vs spray type
+#adult vector ID vs spray type
+insectID_spray <- table(data$INSECT_CAT_10, data$spray_type)
+insectID_spray
+#fisher test
+fisher.test(insectID_spray)
+
+#disease transmission vs spray type
+disease_spray <- table(data$DISEASE_TRANSMIT_10, data$spray_type)
+disease_spray
+#fisher test
+fisher.test(disease_spray)
+
+#know what to do if infested vs spray type
+queharia_spray <- table(data$QUE_HARIA_10, data$spray_type)
+queharia_spray
+#fisher test
+fisher.test(queharia_spray)
+
+#know where to find chiris on property vs spray type
+wheretofind_spray <- table(data$DONDE_BUSCA_CATS, data$spray_type)
+wheretofind_spray
+#fisher test
+fisher.test(wheretofind_spray)
+
+#if they have seen alertachirimacha image vs spray type
+havisto_spray <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$spray_type)[c(1,3),]
+havisto_spray
+#fisher
+fisher.test(havisto_spray)
+
+#if they can ID characteristics of chiri vs spray type
+character_spray <- table(data$CARACT_CATS, data$spray_type)
+character_spray
+#fisher
+fisher.test(character_spray)
+
 
 ##districts with a lot of surveillance post spray - Cayma, Hunter
 ##districts with irregular surveillance post spray - Miraflores, Socabaya
