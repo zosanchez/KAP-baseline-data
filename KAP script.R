@@ -241,6 +241,42 @@ data<- mutate(data, surveillance_type=ifelse(district == "Cayma" | district == "
                                             ifelse(district == "Miraflores" | district == "Socabaya", "irregular",
                                                    ifelse(district == "Jose Luis Bustamante y Rivero" | district == "Paucarpata" | district == "Sachaca" | district == "Tiabaya", "none", 0))))
 
+#tables of knowledge vs surveillance type (does fisher.test work for 2x3)
+#adult vector ID vs surveillance
+insectID_surveillance <- table(data$INSECT_CAT_10, data$surveillance_type)
+insectID_surveillance
+#significance test
+fisher.test(insectID_surveillance)
+
+#disease transmission vs surveillance
+disease_surveillance <- table(data$DISEASE_TRANSMIT_10, data$surveillance_type)
+disease_surveillance
+#significance test
+fisher.test(disease_surveillance)
+
+#know what to do if infested vs surveillance
+queharia_surveillance <- table(data$QUE_HARIA_10, data$surveillance_type)
+queharia_surveillance
+#significance test
+fisher.test(queharia_surveillance)
+
+#know where to find chiri on property vs surveillance
+wheretofind_surveillance <- table(data$DONDE_BUSCA_CATS, data$surveillance_type)
+wheretofind_surveillance
+#significance test
+fisher.test(wheretofind_surveillance)
+
+#if they have seen alertachiri image vs surveillance
+havisto_surveillance <- table(data$HA_VISTO_IMAGEN_MOSTRADA, data$surveillance_type)[c(1,3),]
+havisto_surveillance
+#significance test
+fisher.test(havisto_surveillance)
+
+#if they can ID characteristics of chiris vs surveillance
+character_surveillance <- table(data$CARACT_CATS, data$surveillance_type)
+character_surveillance
+#significance test
+fisher.test(character_surveillance)
 
 
 
