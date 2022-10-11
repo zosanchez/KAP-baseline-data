@@ -910,7 +910,7 @@ data <- mutate(data, IMAGEN_10=ifelse(VIO_IMAGEN_1 == "facebook" | VIO_IMAGEN_2 
 #table vio imagen 1 and 2 vs age35 - to see results for facebook
 vioimagenvsage35 <- table(data$IMAGEN_10, data$AGE35)
 
-#check for significance with age groups and where you've seen alerta chiri flyer
+#check for significance with age groups and where you've seen alerta chiri flyer on facebook
 fisher.test(vioimagenvsage35)
 chisq.test(vioimagenvsage35)
 
@@ -1358,6 +1358,7 @@ table(data$USO_APP_10)
 table(data$EDUCATION_CATS)
 table(data$OCCUPATIONS)
 table(data$district)
+table(data$catchment_name)
 
 
 # Modelo simple&crudo entre Reconoce Chiri y edad
@@ -1414,6 +1415,33 @@ modelo.logit2
 coef(modelo.logit2) %>%
   as_tibble() %>%
   mutate(odds = exp(value))
+
+
+## Modelo multivariado de factores asosiados a RECONOCE CHIRIMACHA- CATCHMENTS INSTEAD OF DISTRICT
+
+logit.catchment <- glm(INSECT_CAT_10 ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS + catchment_name,
+                     data = data, family = "binomial")
+logit.catchment 
+
+coef(logit.catchment) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+
+#make catgories of yes/no for activity in catchments before survey
+data<- mutate(data, catchment_activity=ifelse(catchment_name == "C13PAU" | catchment_name == "C4SOC" | catchment_name == "C7SOC" | catchment_name == "C5CAY" | catchment_name == "C6CAY", "YES", "NO"))
+
+
+## Modelo multivariado de factores asosiados a RECONOCE CHIRIMACHA- CATCHMENT GROUPS (activity y/n) INSTEAD OF DISTRICT
+
+logit.c_activity <- glm(INSECT_CAT_10 ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS + catchment_activity,
+                     data = data, family = "binomial")
+logit.c_activity 
+
+coef(logit.c_activity) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
 
 
 # Modelo simple&crudo entre correctly respond to infestation and ageclass
@@ -1526,6 +1554,27 @@ coef(search.logit) %>%
   as_tibble() %>%
   mutate(odds = exp(value))
 
+
+## Modelo multivariado de factores asosiados a knows where to find chiri - CATCHMENT INSTEAD OF DISTRICT
+
+search_catchment.logit <- glm(DONDE_BUSCA_CATS ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS + catchment_name, 
+                    data = data, family = "binomial")
+search_catchment.logit 
+
+coef(search_catchment.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+## Modelo multivariado de factores asosiados a knows where to find chiri - CATCHMENT activity (y/n) instead of district
+
+search_c.activty.logit <- glm(DONDE_BUSCA_CATS ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS + catchment_activity, 
+                    data = data, family = "binomial")
+search_c.activty.logit 
+
+coef(search_c.activty.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
 #multivariate analysis TABLE 4
 #outcomes
 #1: Knows what to do in case of infestation (QUE_HARIA_10) = dicot
@@ -1551,11 +1600,57 @@ coef(queharia.logit) %>%
 
 
 
+
+## Modelo multivariado de factores asosiados with knowing what to do in case of infestation - CATCHMENTS INSTEAD OF DISTRICTS
+
+queharia.catchment.logit <- glm(QUE_HARIA_10 ~ AGECLASS + EDUCATION_CATS + catchment_name + INSECT_CAT_10 + HA_VISTO_IMAGEN_MOSTRADA,
+                      data = data, family = "binomial")
+queharia.catchment.logit 
+
+coef(queharia.catchment.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+
+## Modelo multivariado de factores asosiados with knowing what to do in case of infestation - CATCHMENT GROUP (activity y/n) INSTEAD OF DISTRICT
+
+queharia.activity.logit <- glm(QUE_HARIA_10 ~ AGECLASS + EDUCATION_CATS + catchment_activity + INSECT_CAT_10 + HA_VISTO_IMAGEN_MOSTRADA,
+                      data = data, family = "binomial")
+queharia.activity.logit 
+
+coef(queharia.activity.logit) %>%
+  as_tibble() %>%
+  mutate(odds = exp(value))
+
+
+
+
 #table for socia media to vector ID
 socialvsID <- table(data$USO_APP_10, data$INSECT_CAT_10)
 
 #fisher test for social media to vector ID
 fisher.test(socialvsID)
+
+
+##comparing different variables to catchments##
+#table catchments vs ability to ID adult triatomine
+table(data$INSECT_CAT_10, data$catchment_name)
+
+#table catchments vs knows chagas is transmitted
+table(data$DISEASE_TRANSMIT_10, data$catchment_name)
+
+#table catchments vs knows where to find triatomines
+table(data$DONDE_BUSCA_CATS, data$catchment_name)
+
+#table catchments vs characteristics
+table(data2$CARACT_CATS, data$catchment_name)
+
+#table catchments vs seen alertachirimacha
+table(data$HA_VISTO_IMAGEN_MOSTRADA, data$catchment_name)
+
+#table catchments vs knows what to do
+table(data$QUE_HARIA_10, data$catchment_name)
+
 
 #download data to excel file
 write.csv(data, file="C:/Users/zoeea/OneDrive/Documents/Immune/data from r.csv", row.names = FALSE)
