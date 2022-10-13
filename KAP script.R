@@ -1442,6 +1442,15 @@ coef(logit.c_activity) %>%
   as_tibble() %>%
   mutate(odds = exp(value))
 
+#multivariat model of factors associated with ID triatomine - glmer with catchment- TABLE 3
+glmer.IDtriatomine <- glmer(INSECT_CAT_10 ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS + (1|catchment_name), data = subset(data), 
+                               family = binomial, control=glmerControl(optimizer = "bobyqa"))
+
+exp(fixef(glmer.IDtriatomine))
+
+exp(confint(glmer.IDtriatomine, method="Wald"))
+
+summary(glmer.IDtriatomine)
 
 
 # Modelo simple&crudo entre correctly respond to infestation and ageclass
@@ -1575,6 +1584,17 @@ coef(search_c.activty.logit) %>%
   as_tibble() %>%
   mutate(odds = exp(value))
 
+
+#multivariat model of factors associated with knowing where to search for a triatomine - glmer with catchment- TABLE 3
+glmer.wheretofind <- glmer(DONDE_BUSCA_CATS ~ AGECLASS + USO_APP_10 + EDUCATION_CATS + OCCUPATIONS + (1|catchment_name), data = subset(data), 
+                            family = binomial, control=glmerControl(optimizer = "bobyqa"))
+
+exp(fixef(glmer.wheretofind))
+
+exp(confint(glmer.wheretofind, method="Wald"))
+
+summary(glmer.wheretofind)
+
 #multivariate analysis TABLE 4
 #outcomes
 #1: Knows what to do in case of infestation (QUE_HARIA_10) = dicot
@@ -1624,11 +1644,16 @@ coef(queharia.activity.logit) %>%
 
 
 
-##### code from mica/ricardo - regression with catchments
+##### code from mica/ricardo - regression with catchments - TABLE 4
 install.packages("lmerTest",dependencies=TRUE)
 library(lmerTest)
-glmer(QUE_HARIA_10 ~ AGECLASS + EDUCATION_CATS + INSECT_CAT_10 + HA_VISTO_IMAGEN_MOSTRADA + (1|catchment_name), data = subset(data), 
+glmer.queharia <- glmer(QUE_HARIA_10 ~ AGECLASS + EDUCATION_CATS + INSECT_CAT_10 + HA_VISTO_IMAGEN_MOSTRADA + (1|catchment_name), data = subset(data), 
       family = binomial, control=glmerControl(optimizer = "bobyqa"))
+
+exp(fixef(glmer.queharia))
+exp(confint(glmer.queharia, method="Wald"))
+
+Summary(glmer.queharia)
       
 ##, optCtrl = list(maxfun = 100000000)) <- above portion of code did not work with this part
 
