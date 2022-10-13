@@ -1624,6 +1624,15 @@ coef(queharia.activity.logit) %>%
 
 
 
+##### code from mica/ricardo - regression with catchments
+install.packages("lmerTest",dependencies=TRUE)
+library(lmerTest)
+glmer(QUE_HARIA_10 ~ AGECLASS + EDUCATION_CATS + INSECT_CAT_10 + HA_VISTO_IMAGEN_MOSTRADA + (1|catchment_name), data = subset(data), 
+      family = binomial, control=glmerControl(optimizer = "bobyqa"))
+      
+##, optCtrl = list(maxfun = 100000000)) <- above portion of code did not work with this part
+
+
 
 #table for socia media to vector ID
 socialvsID <- table(data$USO_APP_10, data$INSECT_CAT_10)
@@ -1652,5 +1661,7 @@ table(data$HA_VISTO_IMAGEN_MOSTRADA, data$catchment_name)
 table(data$QUE_HARIA_10, data$catchment_name)
 
 
-#download data to excel file
+
+
+####download data to excel file
 write.csv(data, file="C:/Users/zoeea/OneDrive/Documents/Immune/data from r.csv", row.names = FALSE)
