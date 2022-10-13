@@ -1655,7 +1655,7 @@ exp(confint(glmer.queharia, method="Wald"))
 
 Summary(glmer.queharia)
       
-##, optCtrl = list(maxfun = 100000000)) <- above portion of code did not work with this part
+##, optCtrl = list(maxfun = 100000000)) <- above portion of code caused error message, but code ran fine without it.
 
 
 
