@@ -162,6 +162,9 @@ data<-mutate(data, AGECLASS= ifelse(EDAD<=31,"18-31",
 data<-mutate(data, AGE35=ifelse(EDAD<=35, "<35",
                                 ifelse(EDAD>35, ">35", 0)))
 
+#density plot of age
+plot(density(data$EDAD))
+
 #dist of people in each ditrict
 table(data$district)
 
@@ -1653,7 +1656,7 @@ glmer.queharia <- glmer(QUE_HARIA_10 ~ AGECLASS + EDUCATION_CATS + INSECT_CAT_10
 exp(fixef(glmer.queharia))
 exp(confint(glmer.queharia, method="Wald"))
 
-Summary(glmer.queharia)
+summary(glmer.queharia)
       
 ##, optCtrl = list(maxfun = 100000000)) <- portion of above code caused error message, but code ran fine without it.
 
